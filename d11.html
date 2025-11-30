@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio: Movimiento de un Electrón (Avanzado)</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #8e44ad; --accent-color-dark: #7d3c98; --electron-color: #f1c40f; --path1-color: #27ae60; --path2-color: #2980b9; --path3-color: #c0392b; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #animacion-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 600px; height: auto; aspect-ratio: 4/1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #f4ecf7; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #f4ecf7; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Ejercicio: Movimiento de un Electrón (Avanzado)</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Un electrón parte del reposo y se mueve en tres fases:</p>
+            <ol>
+                <li>Acelera con $a_1 = 6.00 \times 10^{12} \text{ m/s}^2$ durante $0.120 \text{ µs}$.</li>
+                <li>Se mueve a velocidad constante durante $0.180 \text{ µs}$.</li>
+                <li>Desacelera con $a_2 = -3.00 \times 10^{13} \text{ m/s}^2$ hasta detenerse.</li>
+            </ol>
+            <p><strong>Preguntas:</strong><br>
+            A) ¿Cuál es la velocidad máxima que alcanza?<br>
+            B) ¿Qué distancia recorre en las primeras dos fases?<br>
+            C) ¿Cuánto tiempo tarda en detenerse en la fase final?<br>
+            D) ¿Cuál es la distancia total recorrida?</p>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Visualización del Recorrido</h2>
+            <div id="anim-description">Presiona "Siguiente" para construir la trayectoria.</div>
+            <svg id="animacion-svg" viewBox="0 0 600 150"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>Fase 1: Aceleración (0 a 0.120 µs)</h3>
+            <p>Primero, convertimos el tiempo a segundos: $\tiny t_1 = 0.120 \text{ µs} = 1.20 \times 10^{-7} \text{ s}$.</p>
+            <div class="formula-box">
+                <strong>A) Velocidad Máxima:</strong> $v_1 = v_0 + a_1 t_1 = 0 + (6.00 \times 10^{12})(1.20 \times 10^{-7}) = 7.20 \times 10^5 \text{ m/s}$<br>
+                <strong>Distancia 1:</strong> $\Delta x_1 = \frac{1}{2}a_1 t_1^2 = \frac{1}{2}(6.00 \times 10^{12})(1.20 \times 10^{-7})^2 = 0.0432 \text{ m}$
+            </div>
+
+            <h3>Fase 2: Velocidad Constante (0.120 a 0.300 µs)</h3>
+            <p>El tiempo es $\tiny t_2 = 0.180 \text{ µs} = 1.80 \times 10^{-7} \text{ s}$. La velocidad es constante e igual a $v_1$.</p>
+            <div class="formula-box">
+                <strong>Distancia 2:</strong> $\Delta x_2 = v_1 t_2 = (7.20 \times 10^5)(1.80 \times 10^{-7}) = 0.1296 \text{ m}$<br>
+                <strong>B) Distancia Fases 1+2:</strong> $\Delta x_{1+2} = 0.0432 + 0.1296 = 0.1728 \text{ m}$
+            </div>
+
+            <h3>Fase 3: Deceleración</h3>
+            <p>El electrón frena desde $v_1$ hasta $v_f=0$ con $a_2 = -3.00 \times 10^{13} \text{ m/s}^2$.</p>
+            <div class="formula-box">
+                <strong>C) Tiempo de Frenado:</strong> $v_f = v_1 + a_2 t_3 \implies 0 = 7.20 \times 10^5 + (-3.00 \times 10^{13})t_3$<br>
+                $t_3 = \frac{-7.20 \times 10^5}{-3.00 \times 10^{13}} = 2.40 \times 10^{-8} \text{ s}$ (o 0.024 µs)<br>
+                <strong>Distancia 3:</strong> $v_f^2 = v_1^2 + 2a_2\Delta x_3 \implies \Delta x_3 = \frac{-v_1^2}{2a_2} = \frac{-(7.20 \times 10^5)^2}{2(-3.00 \times 10^{13})} = 0.00864 \text{ m}$
+            </div>
+
+            <h3>Distancia Total</h3>
+            <div class="formula-box">
+                <strong>D) Distancia Total:</strong> $d_{total} = \Delta x_1 + \Delta x_2 + \Delta x_3 = 0.0432 + 0.1296 + 0.00864 = 0.18144 \text{ m}$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuestas Finales (con 3 cifras significativas)</h2>
+            <p class="respuesta-item"><strong>A) Velocidad Máxima:</strong> $7.20 \times 10^5 \text{ m/s}$</p>
+            <p class="respuesta-item"><strong>B) Distancia en Fases 1 y 2:</strong> $0.173 \text{ m}$</p>
+            <p class="respuesta-item"><strong>C) Tiempo de Frenado:</strong> $2.40 \times 10^{-8} \text{ s}$</p>
+            <p class="respuesta-item"><strong>D) Distancia Total:</strong> $0.181 \text{ m}$ (o 18.1 cm)</p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('animacion-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const animationSteps = [
+            { x: 0, desc: "<strong>Inicio:</strong> El electrón parte del reposo en x = 0 m." },
+            { x: 0.0432, desc: "<strong>Fin Fase 1 (Aceleración):</strong> Recorre 4.32 cm y alcanza su velocidad máxima." },
+            { x: 0.1728, desc: "<strong>Fin Fase 2 (Velocidad Constante):</strong> Recorre 13.0 cm adicionales." },
+            { x: 0.18144, desc: "<strong>Fin Fase 3 (Deceleración):</strong> Se detiene tras recorrer 0.86 cm finales." }
+        ];
+
+        const SVG_WIDTH = 600, SVG_HEIGHT = 150;
+        const MARGIN = { top: 60, right: 40, bottom: 50, left: 40 };
+        const G_WIDTH = SVG_WIDTH - MARGIN.left - MARGIN.right;
+        const Y_CENTER = MARGIN.top + (SVG_HEIGHT - MARGIN.top - MARGIN.bottom) / 2;
+
+        const xMax = 0.20; // 20 cm
+        const scaleX = x => MARGIN.left + (x / xMax) * G_WIDTH;
+
+        let svgContent = `<g class="axis">
+            <line x1="${MARGIN.left}" y1="${Y_CENTER}" x2="${MARGIN.left + G_WIDTH}" y2="${Y_CENTER}" stroke="#333" stroke-width="2" />
+            <text x="${MARGIN.left + G_WIDTH + 15}" y="${Y_CENTER + 5}" font-size="14" font-family="Oswald">x (m)</text>`;
+        for (let i = 0; i <= xMax * 100; i += 2) {
+            const pos = i / 100;
+            svgContent += `<line x1="${scaleX(pos)}" y1="${Y_CENTER - 5}" x2="${scaleX(pos)}" y2="${Y_CENTER + 5}" stroke="#333" />
+                           <text x="${scaleX(pos)}" y="${Y_CENTER + 25}" text-anchor="middle" font-size="12">${i} cm</text>`;
+        }
+        svgContent += `</g>`;
+        
+        svgContent += `<line id="path-1" stroke="var(--path1-color)" stroke-width="8" visibility="hidden"/>`;
+        svgContent += `<line id="path-2" stroke="var(--path2-color)" stroke-width="8" visibility="hidden"/>`;
+        svgContent += `<line id="path-3" stroke="var(--path3-color)" stroke-width="8" visibility="hidden"/>`;
+        svgContent += `<circle id="electron" r="8" fill="var(--electron-color)" stroke="black" stroke-width="1"/>`;
+        svg.innerHTML = svgContent;
+
+        const electron = document.getElementById('electron');
+        const path1 = document.getElementById('path-1');
+        const path2 = document.getElementById('path-2');
+        const path3 = document.getElementById('path-3');
+        const paths = [path1, path2, path3];
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+
+            descriptionBox.innerHTML = step.desc;
+            electron.setAttribute('cx', scaleX(step.x));
+            electron.setAttribute('cy', Y_CENTER);
+            electron.style.transition = "cx 0.5s ease-out";
+
+            paths.forEach((path, i) => {
+                if (i < stepIndex) {
+                    const start = animationSteps[i];
+                    const end = animationSteps[i+1];
+                    path.setAttribute('x1', scaleX(start.x));
+                    path.setAttribute('y1', Y_CENTER);
+                    path.setAttribute('x2', scaleX(end.x));
+                    path.setAttribute('y2', Y_CENTER);
+                    path.setAttribute('visibility', 'visible');
+                } else {
+                    path.setAttribute('visibility', 'hidden');
+                }
+            });
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo Interactivo: Lanzamiento Vertical y Alturas</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                macros: {
+                    ymax: 'y_{\\text{máx}}'
+                }
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #d35400; --accent-color-dark: #ba4a00; --ball-color: #2980b9; --height-color: #8e44ad; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        ul { list-style-position: inside; padding-left: 1rem; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-animada-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #animacion-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1/1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #fdebd0; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        #ball, #velocity-vector { transition: all 0.8s ease-in-out; }
+        .vector-line { stroke-width: 3; stroke-linecap: round; }
+        .vector-arrow { fill: currentColor; }
+        .label-text { font-family: var(--font-body); font-size: 16px; font-weight: bold; fill: #333; }
+        .height-line { stroke: #555; stroke-width: 1.5; stroke-dasharray: 4 4; }
+
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #fdebd0; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1 id="main-title"></h1>
+        <section id="enunciado-container" class="card"></section>
+
+        <section id="visualizacion-animada-container" class="card">
+            <h2>Visualización de la Trayectoria</h2>
+            <div id="anim-description"></div>
+            <svg id="animacion-svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section id="solucion-container" class="card"></section>
+        <section id="respuestas-container" class="card" aria-live="polite"></section>
+    </main>
+
+    <!-- TEMPLATES -->
+    <template id="template-enunciado"><h2 class="enunciado-titulo"></h2><div class="enunciado-parrafos"></div></template>
+    <template id="template-solucion"><div class="step-card"><h3 class="solucion-step-titulo"></h3><p class="solucion-step-explicacion"></p><div class="formula-box solucion-step-formula"></div></div></template>
+    <template id="template-respuesta"><p class="respuesta-item"></p></template>
+
+    <script>
+    const ejercicioPelota = {
+        titulo: "Ejercicio: Análisis de un Lanzamiento Vertical",
+        enunciado: {
+            titulo: "Enunciado",
+            parrafos: [
+                "<p>Una pelota es lanzada verticalmente hacia arriba desde el suelo ($y=0$) con una velocidad inicial de $v_0 = 45.0 \\ \\text{m/s}$. Se utiliza $g = 9.80 \\ \\text{m/s}^2$ y el eje +Y es positivo hacia arriba.</p>" +
+                "<ul>" +
+                "<li><strong>1. Intervalo de Tiempo en h:</strong> Calcule el intervalo de tiempo entre los dos pasos por la altura $h = 60.0 \\ \\text{m}$.</li>" +
+                "<li><strong>2. Velocidad en Descenso:</strong> Calcule la velocidad de la pelota al pasar por $h = 60.0 \\ \\text{m}$ mientras desciende.</li>" +
+                "<li><strong>3. Altura Máxima Relativa:</strong> Determine la altura máxima ($\\ymax$) y su distancia a la altura $h$.</li>" +
+                "<li><strong>4. Posición y Velocidad Tardía:</strong> Calcule la posición y velocidad en $t = 7.0 \\ \\text{s}$.</li>" +
+                "</ul>"
+            ]
+        },
+        solucion: {
+            titulo: "Solución Detallada",
+            pasos: [
+                {
+                    titulo: "Paso 1: Ecuaciones de Movimiento",
+                    explicacion: "Las ecuaciones de posición y velocidad, usando los coeficientes con las cifras significativas correctas ($g/2 = 4.90$), son:",
+                    formula: `$y(t) = v_0 t - \\frac{1}{2}gt^2 = 45.0t - 4.90t^2$<br>
+                              $v(t) = v_0 - gt = 45.0 - 9.80t$`
+                },
+                {
+                    titulo: "Pregunta 1: Intervalo de Tiempo en h = 60.0 m",
+                    explicacion: "Buscamos los tiempos $t$ para los que $y(t) = 60.0$. Esto nos da una ecuación cuadrática: $4.90t^2 - 45.0t + 60.0 = 0$.",
+                    formula: `Usando la fórmula cuadrática $t = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$:<br>
+                              $t = \\frac{45.0 \\pm \\sqrt{(-45.0)^2 - 4(4.90)(60.0)}}{2(4.90)} = \\frac{45.0 \\pm \\sqrt{849}}{9.80}$<br>
+                              $t_1 = 1.62 \\ \\text{s}$ (ascenso), $t_2 = 7.57 \\ \\text{s}$ (descenso)<br>
+                              Intervalo: $\\Delta t = t_2 - t_1 = 7.57 - 1.62 = 5.95 \\ \\text{s}$`
+                },
+                {
+                    titulo: "Pregunta 2: Velocidad en Descenso en h = 60.0 m",
+                    explicacion: "Usamos el tiempo de descenso $t_2 = 7.57 \\ \\text{s}$ en la ecuación de velocidad. El resultado se redondea a una posición decimal.",
+                    formula: `$v(7.57) = 45.0 - 9.80(7.57) = 45.0 - 74.186 \\approx -29.2 \\ \\text{m/s}$`
+                },
+                {
+                    titulo: "Pregunta 3: Altura Máxima Relativa",
+                    explicacion: "La altura máxima se alcanza cuando $v(t) = 0$. El resultado de la división se redondea a 3 cifras significativas.",
+                    formula: `$v_f^2 = v_0^2 + 2a\\Delta y \\implies 0^2 = (45.0)^2 + 2(-9.80)(\\ymax - 0)$<br>
+                              $\\ymax = \\frac{2025}{19.6} \\approx 103 \\ \\text{m}$<br>
+                              Distancia relativa: $\\ymax - h = 103.316... - 60.0 = 43.316... \\approx 43 \\ \\text{m}$`
+                },
+                {
+                    titulo: "Pregunta 4: Posición y Velocidad en t = 7.0 s",
+                    explicacion: "Aquí, el tiempo $t=7.0 \\ \\text{s}$ tiene solo 2 cifras significativas, lo que limita la precisión de nuestros resultados.",
+                    formula: `$y(7.0) = 45.0(7.0) - 4.90(7.0)^2 = 315 - 240.1 = 74.9 \\approx 75 \\ \\text{m}$<br>
+                              $v(7.0) = 45.0 - 9.80(7.0) = 45.0 - 68.6 = -23.6 \\approx -24 \\ \\text{m/s}$`
+                }
+            ]
+        },
+        respuestas: {
+            titulo: "Respuestas Finales",
+            items: [
+                "<strong>1. Intervalo de tiempo:</strong> <strong>5.95 s</strong>.",
+                "<strong>2. Velocidad en descenso:</strong> <strong>-29.2 m/s</strong>.",
+                "<strong>3. Altura máxima:</strong> <strong>103 m</strong> (43 m sobre h).",
+                "<strong>4. En t=7.0s:</strong> Posición <strong>75 m</strong>, Velocidad <strong>-24 m/s</strong>."
+            ]
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const elementosParaRenderizar = [];
+        function poblarContenido() {
+            const data = ejercicioPelota;
+            document.getElementById('main-title').innerHTML = data.titulo;
+            const enunciadoContainer = document.getElementById('enunciado-container');
+            const enunciadoTemplate = document.getElementById('template-enunciado');
+            const enunciadoClone = enunciadoTemplate.content.cloneNode(true);
+            enunciadoClone.querySelector('.enunciado-titulo').innerHTML = data.enunciado.titulo;
+            const parrafosDiv = enunciadoClone.querySelector('.enunciado-parrafos');
+            data.enunciado.parrafos.forEach(p => { const pElem = document.createElement('div'); pElem.innerHTML = p; parrafosDiv.appendChild(pElem); });
+            enunciadoContainer.appendChild(enunciadoClone);
+            elementosParaRenderizar.push(enunciadoContainer);
+            const solucionContainer = document.getElementById('solucion-container');
+            const solucionTemplate = document.getElementById('template-solucion');
+            const solucionHeader = document.createElement('h2');
+            solucionHeader.textContent = data.solucion.titulo;
+            solucionContainer.appendChild(solucionHeader);
+            data.solucion.pasos.forEach(step => { const stepClone = solucionTemplate.content.cloneNode(true); stepClone.querySelector('.solucion-step-titulo').innerHTML = step.titulo; stepClone.querySelector('.solucion-step-explicacion').innerHTML = step.explicacion; if (step.formula) { stepClone.querySelector('.solucion-step-formula').innerHTML = step.formula; } else { stepClone.querySelector('.formula-box').remove(); } solucionContainer.appendChild(stepClone); });
+            elementosParaRenderizar.push(solucionContainer);
+            const respuestasContainer = document.getElementById('respuestas-container');
+            const respuestaTemplate = document.getElementById('template-respuesta');
+            const respuestasHeader = document.createElement('h2');
+            respuestasHeader.textContent = data.respuestas.titulo;
+            respuestasContainer.appendChild(respuestasHeader);
+            data.respuestas.items.forEach(item => { const itemClone = respuestaTemplate.content.cloneNode(true); itemClone.querySelector('.respuesta-item').innerHTML = item; respuestasContainer.appendChild(itemClone); });
+            elementosParaRenderizar.push(respuestasContainer);
+        }
+        function renderizarFormulas() { if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) { MathJax.typesetPromise(elementosParaRenderizar).catch((err) => console.error("Error al renderizar MathJax:", err)); } }
+        poblarContenido();
+        document.addEventListener('MathJaxReady', renderizarFormulas);
+        if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) { renderizarFormulas(); }
+
+        const svg = document.getElementById('animacion-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const Y_MAX_PHYSICS = 103; // Usamos el valor redondeado
+        const SVG_WIDTH = 500;
+        const SVG_HEIGHT = 500;
+        const SCALE = (SVG_HEIGHT - 80) / (Y_MAX_PHYSICS * 1.05); // Añadimos un pequeño margen
+        const X_POS = SVG_WIDTH / 2;
+
+        const toSvgY = (y) => SVG_HEIGHT - 40 - (y * SCALE);
+
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" /></marker>
+            </defs>
+            <g id="scene">
+                <line id="ground" x1="0" y1="${toSvgY(0)}" x2="${SVG_WIDTH}" y2="${toSvgY(0)}" stroke="#555" stroke-width="3" />
+                <text x="20" y="${toSvgY(0) - 10}" class="label-text">Suelo (y=0 m)</text>
+                <line id="h-line" class="height-line" stroke="${'var(--height-color)'}" visibility="hidden" x1="0" y1="${toSvgY(60)}" x2="${SVG_WIDTH}" y2="${toSvgY(60)}"/>
+                <text id="h-label" class="label-text" fill="${'var(--height-color)'}" visibility="hidden" x="20" y="${toSvgY(60) - 10}">h = 60.0 m</text>
+                <line id="ymax-line" class="height-line" stroke="${'var(--accent-color)'}" visibility="hidden" x1="0" y1="${toSvgY(Y_MAX_PHYSICS)}" x2="${SVG_WIDTH}" y2="${toSvgY(Y_MAX_PHYSICS)}"/>
+                <text id="ymax-label" class="label-text" fill="${'var(--accent-color)'}" visibility="hidden" x="20" y="${toSvgY(Y_MAX_PHYSICS) - 10}">y_máx = 103 m</text>
+                <circle id="ball" cx="${X_POS}" cy="${toSvgY(0)}" r="10" fill="${'var(--ball-color)'}" />
+                <g id="velocity-vector" transform="translate(${X_POS}, ${toSvgY(0)})" color="${'var(--ball-color)'}">
+                    <line class="vector-line" x1="0" y1="0" x2="0" y2="0" marker-end="url(#arrowhead)" />
+                    <text class="label-text" x="15" y="-25">v</text>
+                </g>
+            </g>
+        `;
+
+        const ball = document.getElementById('ball');
+        const velocityVector = document.getElementById('velocity-vector');
+        const hLine = document.getElementById('h-line');
+        const hLabel = document.getElementById('h-label');
+        const ymaxLine = document.getElementById('ymax-line');
+        const ymaxLabel = document.getElementById('ymax-label');
+
+        // Los pasos de la animación usan los valores redondeados para ser consistentes con el texto
+        const animationSteps = [
+            { title: "Lanzamiento (t = 0 s)", t: 0, y: 0, v: 45.0 },
+            { title: "Paso por h (ascenso, t = 1.62 s)", t: 1.62, y: 60.0, v: 29.1 }, // v(1.62) = 29.1
+            { title: "Altura Máxima (t = 4.59 s)", t: 4.59, y: 103, v: 0 },
+            { title: "Posición en t = 7.0 s", t: 7.0, y: 75, v: -24 },
+            { title: "Paso por h (descenso, t = 7.57 s)", t: 7.57, y: 60.0, v: -29.2 },
+            { title: "Impacto (t = 9.18 s)", t: 9.18, y: 0, v: -45.0 }
+        ];
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            descriptionBox.innerHTML = `<strong>${step.title}</strong><br>y = ${step.y.toFixed(1)} m, v = ${step.v.toFixed(1)} m/s`;
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+            ball.setAttribute('cy', toSvgY(step.y));
+            const vectorScale = 2.0;
+            velocityVector.setAttribute('transform', `translate(${X_POS}, ${toSvgY(step.y)})`);
+            velocityVector.querySelector('line').setAttribute('y2', -step.v * vectorScale);
+            hLine.setAttribute('visibility', stepIndex >= 1 ? 'visible' : 'hidden');
+            hLabel.setAttribute('visibility', stepIndex >= 1 ? 'visible' : 'hidden');
+            ymaxLine.setAttribute('visibility', stepIndex >= 2 ? 'visible' : 'hidden');
+            ymaxLabel.setAttribute('visibility', stepIndex >= 2 ? 'visible' : 'hidden');
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

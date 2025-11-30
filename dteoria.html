@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Cinemática en Una Dimensión</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #0077b6; --accent-color-dark: #005f94; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        ul { list-style-position: inside; padding-left: 1rem; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        .explanation-box { background: #d6eaf8; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-top: 1rem; }
+        .explanation-box p { margin-bottom: 0.5rem; }
+        .key-concept-box { background: #fef9e7; color: #b7950b; border-left: 5px solid #f1c40f; padding: 1rem; border-radius: 0.6rem; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>TEORÍA: CINEMÁTICA EN 1D</h1>
+
+        <section class="card">
+            <h2>Conceptos Fundamentales</h2>
+            <p>La cinemática describe el movimiento de los objetos sin considerar las fuerzas que lo causan. En una dimensión, el movimiento ocurre a lo largo de una línea recta (como el eje X o el eje Y).</p>
+
+            <h3>1. Posición, Desplazamiento y Distancia</h3>
+            <ul>
+                <li><strong>Posición ($x$):</strong> Es la ubicación de un objeto en un instante de tiempo, medida desde un punto de referencia llamado <strong>origen</strong> ($x=0$).</li>
+                <li><strong>Desplazamiento ($\Delta x$):</strong> Es el cambio en la posición. Es un <strong>vector</strong>, lo que significa que tiene magnitud y dirección (indicada por el signo). Se calcula como:
+                    <div class="formula-box">$\Delta x = x_{final} - x_{inicial}$</div>
+                </li>
+                <li><strong>Distancia ($d$):</strong> Es la longitud total del camino recorrido. Es un <strong>escalar</strong>, siempre positivo.</li>
+            </ul>
+            <div class="key-concept-box">
+                <strong>Ejemplo Clave:</strong> Si caminas 10 m hacia adelante y 3 m hacia atrás, tu <strong>distancia</strong> recorrida es de 13 m, pero tu <strong>desplazamiento</strong> es de solo +7 m desde el inicio.
+            </div>
+
+            <h3>2. Velocidad y Rapidez</h3>
+            <ul>
+                <li><strong>Velocidad Media ($\bar{v}$):</strong> Mide qué tan rápido y en qué dirección cambia la posición. Se basa en el <strong>desplazamiento</strong>.
+                    <div class="formula-box">$\bar{v} = \frac{\Delta x}{\Delta t} = \frac{x_f - x_i}{t_f - t_i}$</div>
+                </li>
+                <li><strong>Rapidez Media:</strong> Mide qué tan rápido se recorre un camino, sin importar la dirección. Se basa en la <strong>distancia</strong> total.
+                    <div class="formula-box">$\text{Rapidez Media} = \frac{\text{Distancia Total}}{\text{Tiempo Total}}$</div>
+                </li>
+                <li><strong>Velocidad Instantánea ($v$):</strong> Es la velocidad en un instante de tiempo específico. Si tienes una ecuación de posición $x(t)$, la velocidad instantánea es su derivada:
+                    <div class="formula-box">$v(t) = \frac{dx}{dt}$</div>
+                </li>
+            </ul>
+
+            <h3>3. Aceleración</h3>
+            <ul>
+                <li><strong>Aceleración Media ($\bar{a}$):</strong> Mide qué tan rápido y en qué dirección cambia la velocidad.
+                    <div class="formula-box">$\bar{a} = \frac{\Delta v}{\Delta t} = \frac{v_f - v_i}{t_f - t_i}$</div>
+                </li>
+                <li><strong>Aceleración Instantánea ($a$):</strong> Es la aceleración en un instante de tiempo específico. Es la derivada de la velocidad:
+                    <div class="formula-box">$a(t) = \frac{dv}{dt} = \frac{d^2x}{dt^2}$</div>
+                </li>
+            </ul>
+            <div class="key-concept-box">
+                <strong>¡Cuidado con los signos!</strong> Una aceleración negativa ($a < 0$) <strong>no siempre significa frenar</strong>. Significa que la aceleración apunta en la dirección negativa.
+                <ul>
+                    <li>Si la velocidad y la aceleración tienen el <strong>mismo signo</strong>, el objeto <strong>acelera</strong> (se vuelve más rápido).</li>
+                    <li>Si tienen <strong>signos opuestos</strong>, el objeto <strong>frena</strong> (se vuelve más lento).</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Movimiento con Aceleración Constante (MRUA)</h2>
+            <p>Este es el caso más común en los problemas de introducción. La aceleración no cambia con el tiempo. Aquí están las fórmulas clave:</p>
+
+            <h3>Ecuación 1: Velocidad en función del tiempo</h3>
+            <div class="formula-box">$v_f = v_0 + at$</div>
+            <div class="explanation-box"><strong>Cuándo usarla:</strong> Cuando el problema relaciona velocidad, aceleración y tiempo, pero <strong>no menciona la distancia</strong>.</div>
+
+            <h3>Ecuación 2: Posición en función del tiempo</h3>
+            <div class="formula-box">$\Delta x = v_0 t + \frac{1}{2}at^2$</div>
+            <div class="explanation-box"><strong>Cuándo usarla:</strong> Cuando el problema relaciona distancia, velocidad inicial, aceleración y tiempo, pero <strong>no menciona la velocidad final</strong>.</div>
+
+            <h3>Ecuación 3: Velocidad en función de la posición</h3>
+            <div class="formula-box">$v_f^2 = v_0^2 + 2a\Delta x$</div>
+            <div class="explanation-box"><strong>Cuándo usarla:</strong> Es la fórmula "secreta" para cuando el problema <strong>no menciona el tiempo</strong>. Relaciona directamente velocidad, aceleración y distancia.</div>
+
+            <h3>Caso Especial: Caída Libre (Movimiento en Y)</h3>
+            <p>Es un MRUA donde la aceleración es siempre la de la gravedad, $a = -g \approx -9.8 \text{ m/s}^2$ (si se define +Y hacia arriba).</p>
+        </section>
+
+        <section class="card">
+            <h2>Análisis Gráfico</h2>
+            <p>Las gráficas son una herramienta poderosa para entender el movimiento.</p>
+
+            <h3>Gráfica de Posición vs. Tiempo (x vs t)</h3>
+            <ul>
+                <li>La <strong>pendiente (inclinación)</strong> de la línea en cualquier punto es la <strong>velocidad instantánea</strong>.</li>
+                <li>Una <strong>línea recta</strong> significa velocidad constante (pendiente constante).</li>
+                <li>Una <strong>curva</strong> significa que hay aceleración (la pendiente está cambiando). Para MRUA, la curva es una parábola.</li>
+            </ul>
+
+            <h3>Gráfica de Velocidad vs. Tiempo (v vs t)</h3>
+            <ul>
+                <li>La <strong>pendiente</strong> de la línea es la <strong>aceleración</strong>.</li>
+                <li>Una <strong>línea horizontal</strong> significa aceleración cero (velocidad constante).</li>
+                <li>El <strong>área bajo la curva</strong> entre dos instantes de tiempo es el <strong>desplazamiento ($\Delta x$)</strong>.</li>
+            </ul>
+        </section>
+
+    </main>
+
+</body>
+</html>

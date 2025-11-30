@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo Interactivo: Cinemática en un Acantilado</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                macros: {
+ // Se eliminó 'vec' para evitar la recursividad con el comando interno \vec
+ yA: 'y_A(t)',
+ yB: 'y_B(t)',
+ vA: 'v_A(t)',
+ vB: 'v_B(t)',
+ vAB: '\\vec{v}_{AB}'
+}
+},
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #2980b9; --accent-color-dark: #2471a3; --obj-a-color: #c0392b; --obj-b-color: #27ae60; --crossing-color: #8e44ad; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        ul { list-style-position: inside; padding-left: 1rem; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        /* Estilos de la Visualización Animada */
+        #visualizacion-animada-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #animacion-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1/1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #d6eaf8; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        /* Estilos SVG */
+        #objA, #objB, #vectorA, #vectorB { transition: all 0.8s ease-in-out; }
+        .vector-line { stroke-width: 3; stroke-linecap: round; }
+        .vector-arrow { fill: currentColor; }
+        .label-text { font-family: var(--font-body); font-size: 16px; font-weight: bold; fill: #333; }
+        .height-line { stroke: #555; stroke-width: 1.5; stroke-dasharray: 4 4; }
+
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #d6eaf8; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1 id="main-title"></h1>
+        <section id="enunciado-container" class="card"></section>
+
+        <section id="visualizacion-animada-container" class="card">
+            <h2>Visualización 2D Animada</h2>
+            <div id="anim-description"></div>
+            <svg id="animacion-svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section id="solucion-container" class="card"></section>
+        <section id="respuestas-container" class="card" aria-live="polite"></section>
+    </main>
+
+    <!-- TEMPLATES -->
+    <template id="template-enunciado"><h2 class="enunciado-titulo"></h2><div class="enunciado-parrafos"></div></template>
+    <template id="template-solucion"><div class="step-card"><h3 class="solucion-step-titulo"></h3><p class="solucion-step-explicacion"></p><div class="formula-box solucion-step-formula"></div></div></template>
+    <template id="template-respuesta"><p class="respuesta-item"></p></template>
+
+    <script>
+    const ejercicioAcantilado = {
+        titulo: "Ejercicio: Dos Objetos en un Acantilado",
+        enunciado: {
+            titulo: "Enunciado",
+            parrafos: [
+                "<p>Desde el borde de un acantilado de $H = 120 \\ \\text{m}$ de altura, se lanza verticalmente hacia arriba un <strong>objeto A</strong> con una velocidad inicial de $v_{0A} = 30 \\ \\text{m/s}$. Simultáneamente, desde una posición $D = 50 \\ \\text{m}$ por encima de A, se deja caer un <strong>objeto B</strong> ($v_{0B} = 0 \\ \\text{m/s}$).</p>" +
+                "<p>Se considera $g = 9.8 \\ \\text{m/s}^2$ y el eje +Y positivo hacia arriba, con el suelo en $y=0$.</p>" +
+                "<ul>" +
+                "<li><strong>1. Cruce de Objetos:</strong> ¿En qué tiempo y a qué altura se cruzan?</li>" +
+                "<li><strong>2. Velocidad de A en impacto de B:</strong> ¿Qué velocidad tiene A cuando B toca el suelo?</li>" +
+                "<li><strong>3. Impacto de A en el Suelo:</strong> ¿Con qué velocidad impacta A contra el suelo?</li>" +
+                "<li><strong>4. Velocidad Relativa:</strong> ¿Cuál es la velocidad relativa $\\vec{v}_{AB}$ en $t = 4.0 \\ \\text{s}$?</li>" + // CORREGIDO AQUÍ
+                "</ul>"
+            ]
+        },
+        solucion: {
+            titulo: "Solución Detallada",
+            pasos: [
+                {
+                    titulo: "Paso 1: Ecuaciones de Movimiento",
+                    explicacion: "Establecemos las ecuaciones de posición $y(t) = y_0 + v_0 t - \\frac{1}{2}gt^2$ y velocidad $v(t) = v_0 - gt$ para cada objeto.",
+                    formula: `<strong>Objeto A (lanzado hacia arriba):</strong><br>
+                              $y_{0A} = 120 \\ \\text{m}$, $v_{0A} = +30 \\ \\text{m/s}$<br>
+                              $\\yA = 120 + 30t - 4.9t^2$<br>
+                              $\\vA = 30 - 9.8t$<br><br>
+                              <strong>Objeto B (se deja caer):</strong><br>
+                              $y_{0B} = 120 + 50 = 170 \\ \\text{m}$, $v_{0B} = 0 \\ \\text{m/s}$<br>
+                              $\\yB = 170 - 4.9t^2$<br>
+                              $\\vB = -9.8t$`
+                },
+                {
+                    titulo: "Pregunta 1: Cruce de Objetos",
+                    explicacion: "El cruce ocurre cuando $\\yA = \\yB$. Igualamos las ecuaciones de posición para encontrar el tiempo $t$.",
+                    formula: `$120 + 30t - 4.9t^2 = 170 - 4.9t^2$<br>
+                              $120 + 30t = 170 \\implies 30t = 50 \\implies t = \\frac{5}{3} \\approx 1.67 \\ \\text{s}$<br>
+                              Altura de cruce: $y_B(1.67) = 170 - 4.9(1.67)^2 \\approx 156.4 \\ \\text{m}$`
+                },
+                {
+                    titulo: "Pregunta 2: Velocidad de A en impacto de B",
+                    explicacion: "Primero, calculamos el tiempo que tarda B en llegar al suelo ($y_B = 0$). Luego, usamos ese tiempo en la ecuación de velocidad de A.",
+                    formula: `Tiempo de impacto de B: $0 = 170 - 4.9t_B^2 \\implies t_B = \\sqrt{\\frac{170}{4.9}} \\approx 5.89 \\ \\text{s}$<br>
+                              Velocidad de A en $t_B$: $v_A(5.89) = 30 - 9.8(5.89) \\approx -27.7 \\ \\text{m/s}$`
+                },
+                {
+                    titulo: "Pregunta 3: Impacto de A en el Suelo",
+                    explicacion: "Calculamos la velocidad final de A cuando su posición es $y_A = 0$. Usamos la fórmula independiente del tiempo $v_f^2 = v_0^2 + 2a\\Delta y$.",
+                    formula: `$v_{fA}^2 = (30)^2 + 2(-9.8)(0 - 120) = 900 + 2352 = 3252$<br>
+                              $v_{fA} = -\\sqrt{3252} \\approx -57.0 \\ \\text{m/s}$ (negativa porque va hacia abajo)`
+                },
+                {
+                    titulo: "Pregunta 4: Velocidad Relativa en t = 4s",
+                    explicacion: "Calculamos las velocidades de A y B en $t=4\\text{s}$ y luego encontramos la velocidad relativa $\\vec{v}_{AB} = \\vec{v}_A - \\vec{v}_B$.", // CORREGIDO AQUÍ
+                    formula: `$v_A(4) = 30 - 9.8(4) = -9.2 \\ \\text{m/s}$<br>
+                              $v_B(4) = -9.8(4) = -39.2 \\ \\text{m/s}$<br>
+                              $v_{AB} = v_A - v_B = (-9.2) - (-39.2) = +30 \\ \\text{m/s}$<br>
+                              (Nota: La velocidad relativa es constante e igual a $v_{0A} - v_{0B}$)`
+                }
+            ]
+        },
+        respuestas: {
+            titulo: "Respuestas Finales",
+            items: [
+                "<strong>1. Cruce:</strong> a los <strong>1.67 s</strong> y a una altura de <strong>156.4 m</strong>.",
+                "<strong>2. Velocidad de A:</strong> <strong>-27.7 m/s</strong> cuando B impacta el suelo.",
+                "<strong>3. Impacto de A:</strong> con una velocidad de <strong>-57.0 m/s</strong>.",
+                "<strong>4. Velocidad Relativa (t=4s):</strong> <strong>+30 m/s</strong>."
+            ]
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // --- Lógica de Poblado de Contenido (sin cambios) ---
+        const elementosParaRenderizar = [];
+        function poblarContenido() {
+            const data = ejercicioAcantilado;
+            document.getElementById('main-title').innerHTML = data.titulo;
+            const enunciadoContainer = document.getElementById('enunciado-container');
+            const enunciadoTemplate = document.getElementById('template-enunciado');
+            const enunciadoClone = enunciadoTemplate.content.cloneNode(true);
+            enunciadoClone.querySelector('.enunciado-titulo').innerHTML = data.enunciado.titulo;
+            const parrafosDiv = enunciadoClone.querySelector('.enunciado-parrafos');
+            data.enunciado.parrafos.forEach(p => {
+                const pElem = document.createElement('div'); pElem.innerHTML = p; parrafosDiv.appendChild(pElem);
+            });
+            enunciadoContainer.appendChild(enunciadoClone);
+            elementosParaRenderizar.push(enunciadoContainer);
+            const solucionContainer = document.getElementById('solucion-container');
+            const solucionTemplate = document.getElementById('template-solucion');
+            const solucionHeader = document.createElement('h2');
+            solucionHeader.textContent = data.solucion.titulo;
+            solucionContainer.appendChild(solucionHeader);
+            data.solucion.pasos.forEach(step => {
+                const stepClone = solucionTemplate.content.cloneNode(true);
+                stepClone.querySelector('.solucion-step-titulo').innerHTML = step.titulo;
+                stepClone.querySelector('.solucion-step-explicacion').innerHTML = step.explicacion;
+                if (step.formula) { stepClone.querySelector('.solucion-step-formula').innerHTML = step.formula; } else { stepClone.querySelector('.formula-box').remove(); }
+                solucionContainer.appendChild(stepClone);
+            });
+            elementosParaRenderizar.push(solucionContainer);
+            const respuestasContainer = document.getElementById('respuestas-container');
+            const respuestaTemplate = document.getElementById('template-respuesta');
+            const respuestasHeader = document.createElement('h2');
+            respuestasHeader.textContent = data.respuestas.titulo;
+            respuestasContainer.appendChild(respuestasHeader);
+            data.respuestas.items.forEach(item => {
+                const itemClone = respuestaTemplate.content.cloneNode(true); itemClone.querySelector('.respuesta-item').innerHTML = item; respuestasContainer.appendChild(itemClone);
+            });
+            elementosParaRenderizar.push(respuestasContainer);
+        }
+        function renderizarFormulas() {
+            if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) {
+                MathJax.typesetPromise(elementosParaRenderizar).catch((err) => console.error("Error al renderizar MathJax:", err));
+            }
+        }
+        poblarContenido();
+        document.addEventListener('MathJaxReady', renderizarFormulas);
+        if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) { renderizarFormulas(); }
+
+        // --- Lógica de la Visualización SVG Animada (sin cambios) ---
+        const svg = document.getElementById('animacion-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const SVG_WIDTH = 500;
+        const SVG_HEIGHT = 500;
+        const Y_MAX_PHYSICS = 170; // Altura máxima inicial
+        const SCALE = (SVG_HEIGHT - 80) / Y_MAX_PHYSICS; // Dejar margen arriba y abajo
+        const X_CENTER = SVG_WIDTH / 2;
+
+        // Función para convertir coordenadas físicas (y=0 en suelo) a SVG (y=0 arriba)
+        const toSvgY = (y) => SVG_HEIGHT - 40 - (y * SCALE);
+
+        // Crear elementos SVG
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" />
+                </marker>
+            </defs>
+            <g id="scene">
+                <!-- Entorno -->
+                <rect id="cliff" x="${X_CENTER - 80}" y="${toSvgY(120)}" width="80" height="${120 * SCALE}" fill="#d2b48c" stroke="#8b4513" />
+                <line id="ground" x1="0" y1="${toSvgY(0)}" x2="${SVG_WIDTH}" y2="${toSvgY(0)}" stroke="#555" stroke-width="3" />
+                <text x="20" y="${toSvgY(0) - 10}" class="label-text">Suelo (y=0 m)</text>
+                <line id="cliff-top-line" class="height-line" x1="${X_CENTER-80}" y1="${toSvgY(120)}" x2="${X_CENTER+80}" y2="${toSvgY(120)}"/>
+                <text id="cliff-top-label" x="${X_CENTER+85}" y="${toSvgY(120)+5}" class="label-text">120 m</text>
+                <line id="b-start-line" class="height-line" x1="${X_CENTER-80}" y1="${toSvgY(170)}" x2="${X_CENTER+80}" y2="${toSvgY(170)}"/>
+                <text id="b-start-label" x="${X_CENTER+85}" y="${toSvgY(170)+5}" class="label-text">170 m</text>
+                <line id="crossing-line" class="height-line" stroke="${'var(--crossing-color)'}" visibility="hidden" x1="0" y1="${toSvgY(156.4)}" x2="${SVG_WIDTH}" y2="${toSvgY(156.4)}"/>
+                <text id="crossing-label" class="label-text" fill="${'var(--crossing-color)'}" visibility="hidden" x="20" y="${toSvgY(156.4) - 10}"></text>
+
+                <!-- Objetos -->
+                <circle id="objA" cx="${X_CENTER - 40}" cy="${toSvgY(120)}" r="10" fill="${'var(--obj-a-color)'}" />
+                <circle id="objB" cx="${X_CENTER + 40}" cy="${toSvgY(170)}" r="10" fill="${'var(--obj-b-color)'}" />
+
+                <!-- Vectores de Velocidad -->
+                <g id="vectorA" transform="translate(${X_CENTER - 40}, ${toSvgY(120)})" color="${'var(--obj-a-color)'}">
+                    <line class="vector-line" x1="0" y1="0" x2="0" y2="-50" marker-end="url(#arrowhead)" />
+                    <text class="label-text" x="15" y="-25">v_A</text>
+                </g>
+                <g id="vectorB" transform="translate(${X_CENTER + 40}, ${toSvgY(170)})" color="${'var(--obj-b-color)'}">
+                    <line class="vector-line" x1="0" y1="0" x2="0" y2="0" marker-end="url(#arrowhead)" />
+                    <text class="label-text" x="15" y="25">v_B</text>
+                </g>
+            </g>
+        `;
+
+        const objA = document.getElementById('objA');
+        const objB = document.getElementById('objB');
+        const vectorA = document.getElementById('vectorA');
+        const vectorB = document.getElementById('vectorB');
+        const crossingLine = document.getElementById('crossing-line');
+        const crossingLabel = document.getElementById('crossing-label');
+
+        const animationSteps = [
+            {
+                title: "Estado Inicial (t = 0 s)",
+                t: 0, yA: 120, vA: 30, yB: 170, vB: 0
+            },
+            {
+                title: "Cruce de Objetos (t = 1.67 s)",
+                t: 1.67, yA: 156.4, vA: 13.6, yB: 156.4, vB: -16.4
+            },
+            {
+                title: "Velocidad Relativa (t = 4.0 s)",
+                t: 4.0, yA: 161.6, vA: -9.2, yB: 91.6, vB: -39.2
+            },
+            {
+                title: "B Impacta el Suelo (t = 5.89 s)",
+                t: 5.89, yA: 122.3, vA: -27.7, yB: 0, vB: -57.7
+            },
+            {
+                title: "A Impacta el Suelo (t = 8.88 s)",
+                t: 8.88, yA: 0, vA: -57.0, yB: -198.8, vB: -87.0 // B está bajo tierra
+            }
+        ];
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            
+            descriptionBox.innerHTML = `<strong>${step.title}</strong><br>y_A = ${step.yA.toFixed(1)} m, y_B = ${step.yB.toFixed(1)} m`;
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+
+            objA.setAttribute('cy', toSvgY(step.yA));
+            objB.setAttribute('cy', toSvgY(Math.max(0, step.yB)));
+
+            const vectorScale = 1.5;
+            vectorA.setAttribute('transform', `translate(${X_CENTER - 40}, ${toSvgY(step.yA)})`);
+            vectorA.querySelector('line').setAttribute('y2', -step.vA * vectorScale);
+            
+            vectorB.setAttribute('transform', `translate(${X_CENTER + 40}, ${toSvgY(Math.max(0, step.yB))})`);
+            vectorB.querySelector('line').setAttribute('y2', -step.vB * vectorScale);
+
+            if (stepIndex >= 1) {
+                crossingLine.setAttribute('visibility', 'visible');
+                crossingLabel.setAttribute('visibility', 'visible');
+                crossingLabel.textContent = `Cruce: ${animationSteps[1].yA.toFixed(1)} m`;
+            } else {
+                crossingLine.setAttribute('visibility', 'hidden');
+                crossingLabel.setAttribute('visibility', 'hidden');
+            }
+        }
+
+        btnNext.addEventListener('click', () => {
+            if (currentStep < animationSteps.length - 1) {
+                currentStep++;
+                updateVisualization(currentStep);
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateVisualization(currentStep);
+            }
+        });
+
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

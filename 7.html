@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo Interactivo: Movimiento Relativo Complejo</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX (Configuración Segura y Probada) -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                // Macros con nombres seguros que no causan recursividad
+                macros: {
+                    V: ['\\vec{#1}', 1],
+                    ihat: '\\hat{i}',
+                    jhat: '\\hat{j}'
+                }
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #8e44ad; --accent-color-dark: #7d3c98; --vector-color-v: #2980b9; --vector-color-a: #c0392b; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        #visualizacion-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+        #vector-canvas { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1/1; cursor: grab; }
+        #vector-canvas:active { cursor: grabbing; }
+        .zoom-controls { position: absolute; top: 1.25rem; right: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .zoom-btn { width: 35px; height: 35px; font-size: 1.5rem; font-weight: bold; border: none; border-radius: 50%; background: var(--bg-color); box-shadow: 3px 3px 6px #bebebe, -3px -3px 6px #ffffff; cursor: pointer; transition: all 0.2s ease; }
+        .zoom-btn:hover { color: var(--accent-color); }
+        .zoom-btn:active, .zoom-btn:focus { box-shadow: inset 2px 2px 4px #bebebe, inset -2px -2px 4px #ffffff; outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .controls { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+        .control-btn { font-family: var(--font-body); font-size: 0.9rem; font-weight: 400; padding: 0.6rem 1rem; border: none; border-radius: 0.6rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .control-btn:hover { color: var(--accent-color); }
+        .control-btn:active, .control-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .control-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; /* <-- SOLUCIÓN PARA ECUACIONES LARGAS */ }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #f5eef8; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+        @media (max-width: 640px) { body { padding: 0.8rem; } h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } .card { padding: 1.25rem; } .controls { flex-direction: column; width: 100%; } .control-btn { width: 100%; } .zoom-controls { top: 1rem; right: 1rem; } .zoom-btn { width: 30px; height: 30px; font-size: 1.2rem; } }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1 id="main-title"></h1>
+        <section id="enunciado-container" class="card"></section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Vectores Absolutos del Helicóptero</h2>
+            <canvas id="vector-canvas" width="500" height="500"></canvas>
+            <div class="zoom-controls">
+                <button id="btn-zoom-in" class="zoom-btn" aria-label="Acercar visualización">+</button>
+                <button id="btn-zoom-out" class="zoom-btn" aria-label="Alejar visualización">-</button>
+            </div>
+            <div class="controls">
+                <button id="btn-step1" class="control-btn">1. Dibujar Velocidad Absoluta ($\V{v}_{H/T}$)</button>
+                <button id="btn-step2" class="control-btn" disabled>2. Dibujar Aceleración Absoluta ($\V{a}_{H/T}$)</button>
+                <button id="btn-reset" class="control-btn">Reiniciar</button>
+            </div>
+        </section>
+
+        <section id="solucion-container" class="card"></section>
+        <section id="respuestas-container" class="card" aria-live="polite"></section>
+    </main>
+
+    <!-- TEMPLATES PARA CONTENIDO DINÁMICO -->
+    <template id="template-enunciado"><h2 class="enunciado-titulo"></h2><div class="enunciado-parrafos"></div></template>
+    <template id="template-solucion"><div class="step-card"><h3 class="solucion-step-titulo"></h3><p class="solucion-step-explicacion"></p><div class="formula-box solucion-step-formula"></div></div></template>
+    <template id="template-respuesta"><p class="respuesta-item"></p></template>
+
+    <script>
+    const ejercicioComplejo = {
+        titulo: "Ejercicio: Movimiento Relativo Complejo",
+        enunciado: {
+            titulo: "Enunciado",
+            parrafos: [
+                "Un portaaviones (A) se dirige hacia el Norte a $v_A = 30 \\text{ nudos}$ y tiene una aceleración $a_A = 0.5 \\text{ nudos/min}$ hacia el Este.",
+                "Un avión (P) se mueve con velocidad y aceleración relativas a (A) de:",
+                "<div class='formula-box'>$\\V{v}_{P/A} = (500\\ihat - 200\\jhat)\\ \\text{km/h}$</div>",
+                "<div class='formula-box'>$\\V{a}_{P/A} = (-100\\ihat + 300\\jhat)\\ \\text{km/h}^2$</div>",
+                "Un helicóptero (H) se mueve con velocidad y aceleración relativas a (P) de:",
+                "<div class='formula-box'>$\\V{v}_{H/P} = (50\\ihat + 80\\jhat)\\ \\text{km/h}$</div>",
+                "<div class='formula-box'>$\\V{a}_{H/P} = (20\\ihat - 40\\jhat)\\ \\text{km/h}^2$</div>",
+                "Se pide determinar la <strong>velocidad y aceleración absolutas</strong> del helicóptero (H) respecto a tierra (T). Use $1 \\text{ nudo} \\approx 1.852 \\text{ km/h}$."
+            ]
+        },
+        solucion: {
+            titulo: "Solución Detallada",
+            pasos: [
+                {
+                    titulo: "Parte 1: Velocidad Absoluta del Helicóptero",
+                    explicacion: "La velocidad absoluta del helicóptero ($\V{v}_{H/T}$) se encuentra encadenando las velocidades relativas. La Tierra (T) es nuestro marco de referencia fijo.",
+                    formula: `$\\V{v}_{H/T} = \\V{v}_{H/P} + \\V{v}_{P/A} + \\V{v}_{A/T}$`
+                },
+                {
+                    titulo: "Paso 1.1: Conversión de Unidades de $\V{v}_{A/T}$",
+                    explicacion: "El portaaviones se mueve al Norte a 30 nudos. Convertimos esta velocidad a km/h y la expresamos como vector.",
+                    formula: `$v_{A/T} = 30\\ \\text{nudos} \\times \\frac{1.852\\ \\text{km/h}}{1\\ \\text{nudo}} = 55.56\\ \\text{km/h}$ <br>
+                              $\\V{v}_{A/T} = 55.56\\jhat\\ \\text{km/h}$`
+                },
+                {
+                    titulo: "Paso 1.2: Suma de Vectores de Velocidad",
+                    explicacion: "Sumamos las componentes $\\ihat$ y $\\jhat$ de los tres vectores de velocidad.",
+                    formula: `$\\V{v}_{H/T} = (50\\ihat + 80\\jhat) + (500\\ihat - 200\\jhat) + (55.56\\jhat)$ <br>
+                              $v_{H/T,x} = 50 + 500 + 0 = 550\\ \\text{km/h}$ <br>
+                              $v_{H/T,y} = 80 - 200 + 55.56 = -64.44\\ \\text{km/h}$`
+                },
+                {
+                    titulo: "Parte 2: Aceleración Absoluta del Helicóptero",
+                    explicacion: "De forma análoga, la aceleración absoluta del helicóptero ($\V{a}_{H/T}$) se encuentra encadenando las aceleraciones relativas.",
+                    formula: `$\\V{a}_{H/T} = \\V{a}_{H/P} + \\V{a}_{P/A} + \\V{a}_{A/T}$`
+                },
+                {
+                    titulo: "Paso 2.1: Conversión de Unidades de $\V{a}_{A/T}$",
+                    explicacion: "La aceleración del portaaviones es 0.5 nudos/min hacia el Este. Debemos convertirla a km/h².",
+                    formula: `$a_{A/T} = 0.5\\ \\frac{\\text{nudos}}{\\text{min}} \\times \\frac{1.852\\ \\text{km/h}}{1\\ \\text{nudo}} \\times \\frac{60\\ \\text{min}}{1\\ \\text{h}} = 55.56\\ \\frac{\\text{km}}{\\text{h}^2}$ <br>
+                              $\\V{a}_{A/T} = 55.56\\ihat\\ \\text{km/h}^2$`
+                },
+                {
+                    titulo: "Paso 2.2: Suma de Vectores de Aceleración",
+                    explicacion: "Sumamos las componentes $\\ihat$ y $\\jhat$ de los tres vectores de aceleración.",
+                    formula: `$\\V{a}_{H/T} = (20\\ihat - 40\\jhat) + (-100\\ihat + 300\\jhat) + (55.56\\ihat)$ <br>
+                              $a_{H/T,x} = 20 - 100 + 55.56 = -24.44\\ \\text{km/h}^2$ <br>
+                              $a_{H/T,y} = -40 + 300 + 0 = 260\\ \\text{km/h}^2$`
+                }
+            ]
+        },
+        respuestas: {
+            titulo: "Respuestas Finales",
+            items: [
+                "<strong>Velocidad Absoluta del Helicóptero:</strong>",
+                "<div class='formula-box'>$\\V{v}_{H/T} = (550\\ihat - 64.44\\jhat)\\ \\text{km/h}$</div>",
+                "<strong>Aceleración Absoluta del Helicóptero:</strong>",
+                "<div class='formula-box'>$\\V{a}_{H/T} = (-24.44\\ihat + 260\\jhat)\\ \\text{km/h}^2$</div>"
+            ]
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const elementosParaRenderizar = [];
+
+        function poblarContenido() {
+            const data = ejercicioComplejo;
+            document.getElementById('main-title').innerHTML = data.titulo;
+
+            const enunciadoContainer = document.getElementById('enunciado-container');
+            const enunciadoTemplate = document.getElementById('template-enunciado');
+            const enunciadoClone = enunciadoTemplate.content.cloneNode(true);
+            enunciadoClone.querySelector('.enunciado-titulo').innerHTML = data.enunciado.titulo;
+            const parrafosDiv = enunciadoClone.querySelector('.enunciado-parrafos');
+            data.enunciado.parrafos.forEach(p => {
+                const pElem = document.createElement('div');
+                pElem.innerHTML = p;
+                parrafosDiv.appendChild(pElem);
+            });
+            enunciadoContainer.appendChild(enunciadoClone);
+            elementosParaRenderizar.push(enunciadoContainer);
+
+            const solucionContainer = document.getElementById('solucion-container');
+            const solucionTemplate = document.getElementById('template-solucion');
+            const solucionHeader = document.createElement('h2');
+            solucionHeader.textContent = data.solucion.titulo;
+            solucionContainer.appendChild(solucionHeader);
+            data.solucion.pasos.forEach(step => {
+                const stepClone = solucionTemplate.content.cloneNode(true);
+                stepClone.querySelector('.solucion-step-titulo').innerHTML = step.titulo;
+                stepClone.querySelector('.solucion-step-explicacion').innerHTML = step.explicacion;
+                if (step.formula) { stepClone.querySelector('.solucion-step-formula').innerHTML = step.formula; } else { stepClone.querySelector('.formula-box').remove(); }
+                solucionContainer.appendChild(stepClone);
+            });
+            elementosParaRenderizar.push(solucionContainer);
+
+            const respuestasContainer = document.getElementById('respuestas-container');
+            const respuestaTemplate = document.getElementById('template-respuesta');
+            const respuestasHeader = document.createElement('h2');
+            respuestasHeader.textContent = data.respuestas.titulo;
+            respuestasContainer.appendChild(respuestasHeader);
+            data.respuestas.items.forEach(item => {
+                const itemClone = respuestaTemplate.content.cloneNode(true);
+                itemClone.querySelector('.respuesta-item').innerHTML = item;
+                respuestasContainer.appendChild(itemClone);
+            });
+            elementosParaRenderizar.push(respuestasContainer);
+        }
+
+        function renderizarFormulas() {
+            if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) {
+                MathJax.typesetPromise(elementosParaRenderizar).catch((err) => console.error("Error al renderizar MathJax:", err));
+            }
+        }
+
+        poblarContenido();
+        document.addEventListener('MathJaxReady', renderizarFormulas);
+        if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) {
+            renderizarFormulas();
+        }
+
+        // --- Lógica del Canvas (Adaptada al nuevo ejercicio) ---
+        const canvas = document.getElementById('vector-canvas');
+        const ctx = canvas.getContext('2d');
+        const btns = { step1: document.getElementById('btn-step1'), step2: document.getElementById('btn-step2'), reset: document.getElementById('btn-reset'), zoomIn: document.getElementById('btn-zoom-in'), zoomOut: document.getElementById('btn-zoom-out') };
+        
+        const V_HELICOPTERO = { x: 550, y: -64.44 };
+        const A_HELICOPTERO = { x: -24.44, y: 260 };
+        
+        const ESCALA_BASE = 0.6; 
+        let scale = 1.0;
+        const ORIGEN = { x: canvas.width / 2, y: canvas.height / 2 };
+        let drawnVectors = [];
+
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            dibujarEjes();
+            drawnVectors.forEach(v => drawStaticVector(v.vector, v.color, v.etiqueta, v.startPoint));
+        }
+
+        function dibujarEjes() {
+            ctx.save();
+            ctx.translate(ORIGEN.x, ORIGEN.y);
+            ctx.scale(1, -1); 
+            const currentScale = ESCALA_BASE * scale;
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.beginPath();
+            ctx.moveTo(-width, 0); ctx.lineTo(width, 0);
+            ctx.moveTo(0, -height); ctx.lineTo(0, height);
+            ctx.strokeStyle = '#aaa';
+            ctx.lineWidth = 1 / scale;
+            ctx.setLineDash([5 / scale, 5 / scale]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.scale(1, -1);
+            ctx.font = `${14 / scale}px Oswald`;
+            ctx.fillStyle = '#555';
+            ctx.textAlign = 'center';
+            ctx.fillText('Este (î)', canvas.width/2 - 50/scale, -10/scale);
+            ctx.fillText('Norte (ĵ)', 20/scale, -(canvas.height/2 - 20));
+            ctx.restore();
+        }
+
+        function drawStaticVector(vector, color, etiqueta, startPoint) {
+            const currentScale = ESCALA_BASE * scale;
+            ctx.save();
+            ctx.translate(ORIGEN.x, ORIGEN.y);
+            ctx.scale(1, -1);
+            const startX = startPoint.x * currentScale;
+            const startY = startPoint.y * currentScale;
+            const endX = (startPoint.x + vector.x) * currentScale;
+            const endY = (startPoint.y + vector.y) * currentScale;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3 / scale;
+            ctx.stroke();
+            ctx.save();
+            ctx.translate(endX, endY);
+            ctx.rotate(-Math.atan2(vector.y, vector.x));
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(0, 0); ctx.lineTo(-10/scale, 5/scale); ctx.lineTo(-10/scale, -5/scale); ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+            ctx.scale(1, -1);
+            const labelX = startX + (vector.x * currentScale) / 2;
+            const labelY = -(startY + (vector.y * currentScale) / 2);
+            ctx.font = `bold ${16/scale}px Oswald`;
+            ctx.fillStyle = color;
+            ctx.fillText(etiqueta, labelX + 10/scale, labelY - 10/scale);
+            ctx.restore();
+        }
+
+        function animarVector(vector, color, etiqueta, startPoint = {x: 0, y: 0}) {
+            drawnVectors.push({vector, color, etiqueta, startPoint});
+            const duracion = 1000;
+            let inicio = null;
+            function paso(timestamp) {
+                if (!inicio) inicio = timestamp;
+                const progreso = Math.min((timestamp - inicio) / duracion, 1);
+                redrawCanvas();
+                const currentScale = ESCALA_BASE * scale;
+                ctx.save();
+                ctx.translate(ORIGEN.x, ORIGEN.y);
+                ctx.scale(1, -1);
+                const startX = startPoint.x * currentScale;
+                const startY = startPoint.y * currentScale;
+                const currentX = (startPoint.x + vector.x * progreso) * currentScale;
+                const currentY = (startPoint.y + vector.y * progreso) * currentScale;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(currentX, currentY);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3 / scale;
+                ctx.stroke();
+                ctx.restore();
+                if (progreso === 1) { redrawCanvas(); } else { requestAnimationFrame(paso); }
+            }
+            requestAnimationFrame(paso);
+        }
+        
+        function resetCanvas() {
+            scale = 1.0;
+            drawnVectors = [];
+            redrawCanvas();
+            btns.step1.disabled = false;
+            btns.step2.disabled = true;
+        }
+
+        btns.step1.addEventListener('click', () => { animarVector(V_HELICOPTERO, 'var(--vector-color-v)', 'v_{H/T}'); btns.step1.disabled = true; btns.step2.disabled = false; });
+        btns.step2.addEventListener('click', () => { animarVector(A_HELICOPTERO, 'var(--vector-color-a)', 'a_{H/T}'); btns.step2.disabled = true; });
+        btns.reset.addEventListener('click', resetCanvas);
+        btns.zoomIn.addEventListener('click', () => { scale *= 1.25; redrawCanvas(); });
+        btns.zoomOut.addEventListener('click', () => { scale /= 1.25; redrawCanvas(); });
+
+        resetCanvas();
+    });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparación de Aceleración Media</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #d35400; --accent-color-dark: #ba4a00; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .speedometer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; max-width: 500px; }
+        .speedometer-container { display: flex; flex-direction: column; align-items: center; }
+        .speedometer-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; height: auto; aspect-ratio: 2/1; }
+        .speedometer-title { font-family: var(--font-title); font-size: 1.2rem; margin-top: 0.5rem; }
+        
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; margin-top: 1rem; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #fdebd0; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #fdebd0; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Comparación de Aceleración Media</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Un leopardo puede acelerar desde el reposo hasta <strong>96 km/h</strong> en <strong>2.0 segundos</strong>, mientras que una motocicleta requiere <strong>4.5 segundos</strong> para alcanzar la misma velocidad.</p>
+            <p>Calcule la aceleración media de ambos en m/s².</p>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Visualización Comparativa</h2>
+            <div id="anim-description">Presiona un botón para ver la animación.</div>
+            <div class="speedometer-grid">
+                <div class="speedometer-container">
+                    <svg id="leopard-svg" class="speedometer-svg" viewBox="0 0 200 100"></svg>
+                    <span class="speedometer-title">Leopardo</span>
+                </div>
+                <div class="speedometer-container">
+                    <svg id="moto-svg" class="speedometer-svg" viewBox="0 0 200 100"></svg>
+                    <span class="speedometer-title">Motocicleta</span>
+                </div>
+            </div>
+            <div class="anim-controls">
+                <button id="btn-leopard" class="anim-btn">Animar Leopardo</button>
+                <button id="btn-moto" class="anim-btn">Animar Moto</button>
+                <button id="btn-reset" class="anim-btn">Reiniciar</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>1. Fórmula y Conversión de Unidades</h3>
+            <p>La aceleración media se calcula con la fórmula $\bar{a} = \frac{\Delta v}{\Delta t} = \frac{v_f - v_i}{t_f - t_i}$. Para usarla correctamente, primero debemos convertir la velocidad de km/h a m/s, que son las unidades estándar del SI.</p>
+            <div class="formula-box">
+                $v_f = 96 \frac{\text{km}}{\text{h}} \times \frac{1000 \text{ m}}{1 \text{ km}} \times \frac{1 \text{ h}}{3600 \text{ s}} \approx 26.7 \text{ m/s}$
+            </div>
+            <p>La velocidad inicial ($v_i$) es 0 m/s para ambos, ya que parten del reposo.</p>
+
+            <h3>2. Aceleración Media del Leopardo</h3>
+            <p>Aplicamos la fórmula con el tiempo del leopardo. El resultado se redondea a dos cifras significativas, ya que los datos de entrada (96 y 2.0) tienen dos.</p>
+            <div class="formula-box">
+                $\bar{a}_{\text{leopardo}} = \frac{26.7 \text{ m/s} - 0 \text{ m/s}}{2.0 \text{ s}} = 13.35 \frac{\text{m}}{\text{s}^2} \approx 13 \frac{\text{m}}{\text{s}^2}$
+            </div>
+
+            <h3>3. Aceleración Media de la Motocicleta</h3>
+            <p>Repetimos el cálculo con el tiempo de la motocicleta, redondeando también a dos cifras significativas.</p>
+            <div class="formula-box">
+                $\bar{a}_{\text{moto}} = \frac{26.7 \text{ m/s} - 0 \text{ m/s}}{4.5 \text{ s}} = 5.93 \frac{\text{m}}{\text{s}^2} \approx 5.9 \frac{\text{m}}{\text{s}^2}$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuestas Finales</h2>
+            <p class="respuesta-item"><strong>Aceleración del Leopardo:</strong> $13 \text{ m/s}^2$</p>
+            <p class="respuesta-item"><strong>Aceleración de la Motocicleta:</strong> $5.9 \text{ m/s}^2$</p>
+            <p>El leopardo tiene una aceleración más de dos veces superior a la de la motocicleta.</p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svgLeopard = document.getElementById('leopard-svg');
+        const svgMoto = document.getElementById('moto-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnLeopard = document.getElementById('btn-leopard');
+        const btnMoto = document.getElementById('btn-moto');
+        const btnReset = document.getElementById('btn-reset');
+
+        const centerX = 100, centerY = 90, radius = 80;
+
+        function drawSpeedometer(svg) {
+            const arc = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            arc.setAttribute("d", `M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`);
+            arc.setAttribute("stroke", "#999");
+            arc.setAttribute("stroke-width", "5");
+            arc.setAttribute("fill", "none");
+            svg.appendChild(arc);
+
+            const labels = [0, 48, 96];
+            labels.forEach((label, index) => {
+                const angle = -90 + (index * 90);
+                const rad = angle * Math.PI / 180;
+                const x = centerX + (radius + 15) * Math.cos(rad);
+                const y = centerY + (radius + 15) * Math.sin(rad);
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", x);
+                text.setAttribute("y", y);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("dominant-baseline", "middle");
+                text.setAttribute("font-size", "14");
+                text.setAttribute("font-family", "Oswald");
+                text.textContent = label;
+                svg.appendChild(text);
+            });
+            
+            const unitText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            unitText.setAttribute("x", centerX);
+            unitText.setAttribute("y", centerY - 15);
+            unitText.setAttribute("text-anchor", "middle");
+            unitText.setAttribute("font-size", "12");
+            unitText.textContent = "km/h";
+            svg.appendChild(unitText);
+
+            const needle = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            needle.setAttribute("x1", centerX);
+            needle.setAttribute("y1", centerY);
+            needle.setAttribute("x2", centerX);
+            needle.setAttribute("y2", centerY - radius + 5);
+            needle.setAttribute("stroke", "var(--accent-color)");
+            needle.setAttribute("stroke-width", "3");
+            needle.setAttribute("stroke-linecap", "round");
+            needle.setAttribute("transform-origin", `${centerX} ${centerY}`);
+            needle.classList.add("needle");
+            svg.appendChild(needle);
+        }
+
+        function animateNeedle(needle, duration, onComplete) {
+            let start = null;
+            function step(timestamp) {
+                if (!start) start = timestamp;
+                const progress = Math.min((timestamp - start) / duration, 1);
+                const angle = progress * 180 - 90;
+                needle.setAttribute("transform", `rotate(${angle})`);
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    onComplete();
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function reset() {
+            [svgLeopard, svgMoto].forEach(svg => {
+                const needle = svg.querySelector('.needle');
+                if (needle) needle.setAttribute("transform", "rotate(-90)");
+            });
+            descriptionBox.innerHTML = "Presiona un botón para ver la animación.";
+            btnLeopard.disabled = false;
+            btnMoto.disabled = false;
+        }
+
+        btnLeopard.addEventListener('click', () => {
+            btnLeopard.disabled = true;
+            btnMoto.disabled = true;
+            const needle = svgLeopard.querySelector('.needle');
+            animateNeedle(needle, 2000, () => {
+                descriptionBox.innerHTML = "<strong>Leopardo:</strong> Aceleración media de <strong>13 m/s²</strong>.";
+            });
+        });
+
+        btnMoto.addEventListener('click', () => {
+            btnLeopard.disabled = true;
+            btnMoto.disabled = true;
+            const needle = svgMoto.querySelector('.needle');
+            animateNeedle(needle, 4500, () => {
+                descriptionBox.innerHTML = "<strong>Motocicleta:</strong> Aceleración media de <strong>5.9 m/s²</strong>.";
+            });
+        });
+
+        btnReset.addEventListener('click', reset);
+
+        drawSpeedometer(svgLeopard);
+        drawSpeedometer(svgMoto);
+        reset();
+    });
+    </script>
+
+</body>
+</html>

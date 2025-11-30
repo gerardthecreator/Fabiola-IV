@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayudando a Fabiola - Índice de Ejercicios</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Hoja de Estilos (asumiendo que tienes un style.css) -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Estilos para el menú y la nueva estructura -->
+    <style>
+        :root {
+            --theory-card-bg: #e8f8f5; /* Un color suave para las tarjetas de teoría */
+            --theory-card-accent: #16a085;
+        }
+
+        .filter-menu {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            background: var(--bg-color, #e0e0e0);
+            box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+            transition: all 0.2s ease-in-out;
+            color: var(--primary-font-color, #3c3c3c);
+        }
+
+        .filter-btn:hover {
+            color: #d35400;
+        }
+
+        .filter-btn.active {
+            box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff;
+            color: #d35400;
+            font-weight: 500;
+        }
+
+        /* Usamos Grid para un layout más robusto y alineado */
+        .link-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .link-card {
+            transition: transform 0.3s ease, opacity 0.4s ease, box-shadow 0.3s ease;
+        }
+        
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 12px 12px 20px #bebebe, -12px -12px 20px #ffffff;
+        }
+
+        .link-card.hidden {
+            transform: scale(0.9);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Estilo especial para las tarjetas de teoría */
+        .theory-card {
+            background-color: var(--theory-card-bg);
+            border-left: 5px solid var(--theory-card-accent);
+        }
+        .theory-card h2 {
+            color: var(--theory-card-accent);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Preloader / Splash Screen -->
+    <div id="preloader">
+        <div class="rays-container">
+            <div class="ray"></div><div class="ray"></div><div class="ray"></div><div class="ray"></div>
+            <div class="ray"></div><div class="ray"></div><div class="ray"></div><div class="ray"></div>
+        </div>
+        <img src="logo.jpg" alt="Logo Ayudando a Fabiola">
+    </div>
+
+    <!-- Contenido Principal -->
+    <main id="main-content">
+        <header class="main-header">
+            <h1>Ayudando a Fabiola</h1>
+            <p>Índice de Ejercicios y Teoría de Cinemática</p>
+        </header>
+
+        <!-- Menú de Filtros Definitivo -->
+        <nav class="filter-menu">
+            <button class="filter-btn active" data-filter="todos">Mostrar Todos</button>
+            <button class="filter-btn" data-filter="teoria">Teoría</button>
+            <button class="filter-btn" data-filter="movimiento-1d">Movimiento en 1D</button>
+            <button class="filter-btn" data-filter="movimiento-y">Movimiento en Y</button>
+            <button class="filter-btn" data-filter="relativo">Movimiento Relativo</button>
+        </nav>
+
+        <div class="link-container">
+            <!-- TEORÍA -->
+            <a href="dteoria.html" class="link-card theory-card" data-category="teoria">
+                <h2>Teoría: Cinemática en 1D</h2>
+                <p>Conceptos de posición, velocidad y aceleración en una dimensión.</p>
+            </a>
+            <a href="gteoria.html" class="link-card theory-card" data-category="teoria">
+                <h2>Teoría: Movimiento Vertical</h2>
+                <p>Fórmulas y estrategias para problemas de caída libre y lanzamientos verticales.</p>
+            </a>
+            <a href="teoria.html" class="link-card theory-card" data-category="teoria">
+                <h2>Teoría: Movimiento Relativo</h2>
+                <p>La guía completa sobre cinemática vectorial y marcos de referencia.</p>
+            </a>
+
+            <!-- EJERCICIOS DE MOVIMIENTO EN 1D -->
+            <a href="d1.html" class="link-card" data-category="movimiento-1d"><h2>D1: Análisis de Movimiento por Tramos</h2><p>Cálculo de velocidad media a partir de una tabla de datos de posición y tiempo.</p></a>
+            <a href="d2.html" class="link-card" data-category="movimiento-1d"><h2>D2: Movimiento con Aceleración Constante</h2><p>Análisis de un móvil en tres fases: aceleración, velocidad constante y frenado.</p></a>
+            <a href="d3.html" class="link-card" data-category="movimiento-1d"><h2>D3: Movimiento a partir de una Ecuación</h2><p>Cálculo de desplazamiento y velocidad promedio desde x(t) = -4t + 2t².</p></a>
+            <a href="d4.html" class="link-card" data-category="movimiento-1d"><h2>D4: Aceleración Variable y Distancia Total</h2><p>Análisis de una partícula con ecuación cúbica, usando derivadas.</p></a>
+            <a href="d5.html" class="link-card" data-category="movimiento-1d"><h2>D5: Desplazamiento vs. Distancia</h2><p>Un perro corre de ida y vuelta. Diferencia entre velocidad y rapidez media.</p></a>
+            <a href="d6.html" class="link-card" data-category="movimiento-1d"><h2>D6: Aceleración Media Comparativa</h2><p>Comparación de la aceleración de un leopardo y una motocicleta.</p></a>
+            <a href="d7.html" class="link-card" data-category="movimiento-1d"><h2>D7: Distancia de Frenado</h2><p>Cálculo de la distancia que necesita un coche para detenerse por completo.</p></a>
+            <a href="d8.html" class="link-card" data-category="movimiento-1d"><h2>D8: Persecución Policial Simple</h2><p>Un policía acelera para alcanzar a un infractor que viaja a velocidad constante.</p></a>
+            <a href="d9.html" class="link-card" data-category="movimiento-1d"><h2>D9: Persecución con Ventaja Inicial</h2><p>Un guepardo persigue a una gacela que parte con ventaja. Solución con ecuación cuadrática.</p></a>
+            <a href="d10.html" class="link-card" data-category="movimiento-1d"><h2>D10: Movimiento de un Electrón (Simple)</h2><p>Cálculo de la distancia total de un electrón en tres fases de movimiento.</p></a>
+            <a href="d11.html" class="link-card" data-category="movimiento-1d"><h2>D11: Movimiento de un Electrón (Avanzado)</h2><p>Análisis completo de un electrón, calculando velocidad, tiempo y distancias.</p></a>
+
+            <!-- EJERCICIOS DE MOVIMIENTO EN Y -->
+            <a href="g1.html" class="link-card" data-category="movimiento-y"><h2>G1: Lanzamiento Vertical Simple</h2><p>Calcular velocidad inicial y altura máxima a partir del tiempo de subida.</p></a>
+            <a href="g2.html" class="link-card" data-category="movimiento-y"><h2>G2: Encuentro de Dos Pelotas</h2><p>Calcular el punto y tiempo de cruce de dos objetos en movimiento vertical.</p></a>
+            <a href="g3.html" class="link-card" data-category="movimiento-y"><h2>G3: Cohete en Dos Fases</h2><p>Análisis de un cohete con impulso inicial y posterior vuelo libre.</p></a>
+            <a href="g4.html" class="link-card" data-category="movimiento-y"><h2>G4: Cruce en un Acantilado</h2><p>Problema complejo con dos objetos, cruce, impacto y velocidad relativa.</p></a>
+            <a href="g5.html" class="link-card" data-category="movimiento-y"><h2>G5: Análisis de Alturas y Tiempos</h2><p>Cálculo de intervalos de tiempo y velocidades en una altura específica.</p></a>
+
+            <!-- EJERCICIOS DE MOVIMIENTO RELATIVO Y VECTORIAL -->
+            <a href="1.html" class="link-card" data-category="relativo"><h2>R1: Corrigiendo el Rumbo</h2><p>Un piloto compensa el viento para volar hacia el Norte (trigonométrico).</p></a>
+            <a href="2.html" class="link-card" data-category="relativo"><h2>R2: Misión en el Río</h2><p>Un bote cruza un río con corriente para llegar a un punto específico.</p></a>
+            <a href="3.html" class="link-card" data-category="relativo"><h2>R3: Cinemática del Velero</h2><p>Cálculo de velocidad media e instantánea a partir de ecuaciones de posición.</p></a>
+            <a href="4.html" class="link-card" data-category="relativo"><h2>R4: Rumbo del Avión (Clásico)</h2><p>Un avión compensa un viento lateral para mantener un rumbo Norte.</p></a>
+            <a href="5.html" class="link-card" data-category="relativo"><h2>R5: Cinemática de un Proyectil</h2><p>Cálculo de velocidad y aceleración a partir de la ecuación de posición.</p></a>
+            <a href="6.html" class="link-card" data-category="relativo"><h2>R6: Aceleración en una Curva</h2><p>Cálculo de la aceleración media de un coche que cambia de dirección.</p></a>
+            <a href="7.html" class="link-card" data-category="relativo"><h2>R7: Movimiento Relativo Complejo</h2><p>Problema avanzado con tres cuerpos: portaaviones, avión y helicóptero.</p></a>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        // Script del Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            const mainContent = document.getElementById('main-content');
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                mainContent.style.opacity = '1';
+                setTimeout(() => { preloader.style.display = 'none'; }, 800); 
+            }, 1000); 
+        });
+
+        // Script para el Menú de Filtros
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.link-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const filter = button.dataset.filter;
+
+                    cards.forEach(card => {
+                        const category = card.dataset.category;
+                        const shouldShow = filter === 'todos' || category === filter;
+                        
+                        if (shouldShow) {
+                            card.classList.remove('hidden');
+                            card.style.display = ''; // Restablece a su display por defecto (grid lo manejará)
+                        } else {
+                            card.classList.add('hidden');
+                            // Ocultar del layout después de la animación de salida
+                            setTimeout(() => {
+                                if (card.classList.contains('hidden')) {
+                                    card.style.display = 'none';
+                                }
+                            }, 400);
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+/* --- Variables Globales --- */
+:root {
+    --bg-color: #e0e0e0;
+    --primary-font-color: #3c3c3c;
+    --accent-color: #8e44ad; /* Morado para la página principal */
+    --accent-color-dark: #7d3c98;
+    --theory-card-color: #16a085; /* Verde para la tarjeta de teoría */
+    --card-padding: 1.5rem;
+    --card-border-radius: 1.25rem;
+    --font-title: 'Anton', sans-serif;
+    --font-body: 'Oswald', sans-serif;
+}
+
+/* --- Reset y Estilos Base --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--primary-font-color);
+    line-height: 1.6;
+}
+
+/* --- Estilos del Preloader / Splash Screen --- */
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease-out;
+}
+
+#preloader img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff;
+    z-index: 10;
+}
+
+.rays-container {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    animation: rotate 20s linear infinite;
+}
+
+.ray {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    background: linear-gradient(to top, transparent, var(--accent-color), transparent);
+    transform-origin: center;
+}
+
+/* Posicionamiento de cada rayo */
+.ray:nth-child(1) { transform: rotate(0deg); }
+.ray:nth-child(2) { transform: rotate(45deg); }
+.ray:nth-child(3) { transform: rotate(90deg); }
+.ray:nth-child(4) { transform: rotate(135deg); }
+.ray:nth-child(5) { transform: rotate(180deg); }
+.ray:nth-child(6) { transform: rotate(225deg); }
+.ray:nth-child(7) { transform: rotate(270deg); }
+.ray:nth-child(8) { transform: rotate(315deg); }
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* --- Estilos del Contenido Principal --- */
+#main-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    opacity: 0; /* Inicialmente oculto */
+    transition: opacity 0.8s ease-in;
+}
+
+.main-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.main-header h1 {
+    font-family: var(--font-title);
+    font-size: 3.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #333;
+}
+
+.main-header p {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #555;
+}
+
+.link-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.link-card {
+    display: block;
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    background: var(--bg-color);
+    box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease-in-out;
+}
+
+.link-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 12px 12px 20px #bebebe, -12px -12px 20px #ffffff;
+}
+
+.link-card h2 {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    color: var(--accent-color-dark);
+    margin-bottom: 0.5rem;
+    transition: color 0.2s;
+}
+
+.link-card.theory-card h2 {
+    color: var(--theory-card-color);
+}
+
+.link-card p {
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+@media (max-width: 640px) {
+    #main-content { padding: 1rem; }
+    .main-header h1 { font-size: 2.5rem; }
+    .link-container { grid-template-columns: 1fr; }
+}

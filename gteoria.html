@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Movimiento Vertical (Eje Y)</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                macros: {
+                    ymax: 'y_{\\text{máx}}'
+                }
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #0077b6; --accent-color-dark: #005f94; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        ul { list-style-position: inside; padding-left: 1rem; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        .explanation-box { background: #d6eaf8; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-top: 1rem; }
+        .explanation-box p { margin-bottom: 0.5rem; }
+        .explanation-box strong { color: #333; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>TEORÍA: MOVIMIENTO VERTICAL (EJE Y)</h1>
+
+        <section class="card">
+            <h2>Conceptos Fundamentales</h2>
+            <p>El movimiento vertical es un caso especial del <strong>Movimiento Rectilíneo Uniformemente Acelerado (MRUA)</strong>, donde la única aceleración que actúa sobre el objeto es la gravedad. A esto también se le conoce como <strong>caída libre</strong>.</p>
+
+            <h3>1. Sistema de Referencia</h3>
+            <p>Es lo más importante. Casi siempre, usaremos un sistema donde:</p>
+            <ul>
+                <li>El <strong>suelo</strong> o punto de partida es $y=0$.</li>
+                <li>La dirección <strong>hacia arriba</strong> es positiva (+Y).</li>
+                <li>La dirección <strong>hacia abajo</strong> es negativa (-Y).</li>
+            </ul>
+
+            <h3>2. Aceleración de la Gravedad (g)</h3>
+            <p>La gravedad siempre tira de los objetos hacia el centro de la Tierra (hacia abajo). Por lo tanto, en nuestro sistema de referencia, su valor es siempre <strong>negativo</strong>.</p>
+            <div class="formula-box">
+                $a = -g \approx -9.80 \text{ m/s}^2$
+            </div>
+            <p>Esta aceleración es constante durante todo el vuelo del objeto (despreciando la resistencia del aire).</p>
+
+            <h3>3. Velocidad (v)</h3>
+            <p>El signo de la velocidad nos indica la dirección del movimiento:</p>
+            <ul>
+                <li><strong>Velocidad positiva ($v > 0$):</strong> El objeto está subiendo.</li>
+                <li><strong>Velocidad negativa ($v < 0$):</strong> El objeto está bajando.</li>
+                <li><strong>Velocidad cero ($v = 0$):</strong> El objeto se encuentra en el punto más alto de su trayectoria (altura máxima). ¡Este es un dato clave para resolver muchos problemas!</li>
+            </ul>
+
+            <h3>4. Simetría del Movimiento</h3>
+            <p>Si un objeto es lanzado desde una altura y regresa a esa misma altura (por ejemplo, del suelo al suelo):</p>
+            <ul>
+                <li>El <strong>tiempo de subida</strong> es igual al <strong>tiempo de bajada</strong>.</li>
+                <li>La <strong>velocidad de llegada</strong> tiene la misma magnitud que la de partida, pero signo opuesto ($v_f = -v_0$).</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Las Ecuaciones del Movimiento</h2>
+            <p>Estas son las tres fórmulas principales que necesitarás. Derivan de las ecuaciones del MRUA, con $a = -g$.</p>
+
+            <h3>1. Ecuación de Posición</h3>
+            <div class="formula-box">
+                $y(t) = y_0 + v_0 t - \frac{1}{2}gt^2$
+            </div>
+            <div class="explanation-box">
+                <p><strong>Variables:</strong> $y(t)$ es la posición final, $y_0$ es la posición inicial, $v_0$ es la velocidad inicial, $t$ es el tiempo.</p>
+                <p><strong>Cuándo usarla:</strong> Cuando el problema involucra <strong>posición y tiempo</strong>. Es ideal para encontrar a qué altura está un objeto en un tiempo dado, o en qué momento llega a cierta altura.</p>
+            </div>
+
+            <h3>2. Ecuación de Velocidad</h3>
+            <div class="formula-box">
+                $v(t) = v_0 - gt$
+            </div>
+            <div class="explanation-box">
+                <p><strong>Variables:</strong> $v(t)$ es la velocidad final, $v_0$ es la velocidad inicial, $t$ es el tiempo.</p>
+                <p><strong>Cuándo usarla:</strong> Cuando el problema relaciona <strong>velocidad y tiempo</strong>. Perfecta para saber qué velocidad tiene un objeto después de cierto tiempo, o cuánto tarda en alcanzar una velocidad específica (como $v=0$ en la altura máxima).</p>
+            </div>
+
+            <h3>3. Ecuación Independiente del Tiempo</h3>
+            <div class="formula-box">
+                $v_f^2 = v_0^2 - 2g(y_f - y_0)$
+            </div>
+            <div class="explanation-box">
+                <p><strong>Variables:</strong> $v_f$ es la velocidad final, $v_0$ es la velocidad inicial, $y_f$ es la posición final, $y_0$ es la posición inicial.</p>
+                <p><strong>Cuándo usarla:</strong> Es tu "arma secreta" cuando el problema <strong>no te da ni te pide el tiempo</strong>. Relaciona directamente velocidad y posición, ideal para encontrar la altura máxima o la velocidad de impacto sin calcular el tiempo de vuelo.</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Estrategias para Resolver Problemas</h2>
+            <p>Sigue estos pasos para abordar cualquier problema de movimiento vertical de forma ordenada:</p>
+            <ol>
+                <li><strong>Dibuja un Esquema:</strong> Visualiza el problema. Dibuja el suelo, el punto de lanzamiento, la trayectoria y los puntos de interés.</li>
+                <li><strong>Establece tu Sistema de Referencia:</strong> Define dónde está $y=0$ y cuál es la dirección positiva (casi siempre, +Y hacia arriba).</li>
+                <li><strong>Lista tus Datos:</strong> Escribe todos los valores conocidos ($y_0, v_0, y_f, v_f, a, t$), asegurándote de que sus <strong>signos sean correctos</strong> según tu sistema de referencia. La aceleración $a$ siempre será $-g$.</li>
+                <li><strong>Identifica la Incógnita:</strong> ¿Qué te pide el problema que calcules?</li>
+                <li><strong>Elige la Ecuación Correcta:</strong> Mira tus datos conocidos y tu incógnita. Selecciona la fórmula que contenga esas variables.</li>
+                <li><strong>Resuelve y Verifica:</strong> Despeja la incógnita y calcula el resultado. Al final, pregúntate: ¿Tiene sentido el resultado? ¿Son correctas las unidades? ¿El signo es lógico?</li>
+            </ol>
+        </section>
+
+    </main>
+
+</body>
+</html>

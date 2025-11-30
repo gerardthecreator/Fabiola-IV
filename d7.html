@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio: Distancia de Frenado</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #2980b9; --accent-color-dark: #2471a3; --car-color: #c0392b; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #animacion-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 600px; height: auto; aspect-ratio: 4/1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #d6eaf8; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #d6eaf8; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Ejercicio: Distancia de Frenado</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Una persona conduce un vehículo de noche por una autopista. De pronto, a cierta distancia, ve otro coche parado y frena con una aceleración de <strong>5.0 m/s²</strong>. Si la velocidad inicial del vehículo era de <strong>15 m/s</strong>, ¿cuál es la distancia de frenado?</p>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Visualización del Frenado</h2>
+            <div id="anim-description">Presiona "Iniciar Frenado" para ver la animación.</div>
+            <svg id="animacion-svg" viewBox="0 0 600 150"></svg>
+            <div class="anim-controls">
+                <button id="btn-start" class="anim-btn">Iniciar Frenado</button>
+                <button id="btn-reset" class="anim-btn">Reiniciar</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>1. Identificar los Datos y el Sistema de Referencia</h3>
+            <p>Establecemos el eje +X en la dirección del movimiento del coche. El frenado es una aceleración en dirección opuesta, por lo tanto, es negativa.</p>
+            <div class="formula-box">
+                Velocidad inicial ($v_0$): $+15 \text{ m/s}$<br>
+                Velocidad final ($v_f$): $0 \text{ m/s}$ (el coche se detiene)<br>
+                Aceleración ($a$): $-5.0 \text{ m/s}^2$<br>
+                Incógnita: Distancia de frenado ($\Delta x$)
+            </div>
+
+            <h3>2. Elegir la Ecuación Cinemática Correcta</h3>
+            <p>Conocemos las velocidades inicial y final, y la aceleración. Queremos encontrar la distancia. El tiempo no es necesario ni se proporciona. La fórmula ideal es la ecuación independiente del tiempo:</p>
+            <div class="formula-box">
+                $v_f^2 = v_0^2 + 2a\Delta x$
+            </div>
+
+            <h3>3. Resolver para la Distancia ($\Delta x$)</h3>
+            <p>Despejamos $\Delta x$ de la ecuación y sustituimos los valores conocidos. El resultado se redondea a dos cifras significativas, igual que los datos de entrada.</p>
+            <div class="formula-box">
+                $0^2 = (15)^2 + 2(-5.0)\Delta x$<br>
+                $0 = 225 - 10\Delta x$<br>
+                $10\Delta x = 225$<br>
+                $\Delta x = \frac{225}{10} = 22.5 \text{ m} \approx 23 \text{ m}$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuesta Final</h2>
+            <p class="respuesta-item">La distancia de frenado del vehículo es de <strong>23 metros</strong>.</p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('animacion-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnStart = document.getElementById('btn-start');
+        const btnReset = document.getElementById('btn-reset');
+
+        const SVG_WIDTH = 600, SVG_HEIGHT = 150;
+        const Y_CENTER = SVG_HEIGHT / 2 + 10;
+        const START_X = 50;
+        const END_X = 550;
+
+        // Dibujar carretera
+        let svgContent = `<g class="road">
+            <line x1="0" y1="${Y_CENTER}" x2="${SVG_WIDTH}" y2="${Y_CENTER}" stroke="#555" stroke-width="20" />
+            <line x1="0" y1="${Y_CENTER}" x2="${SVG_WIDTH}" y2="${Y_CENTER}" stroke="#fff" stroke-width="1" stroke-dasharray="20 15" />
+        </g>`;
+        
+        // Placeholder para la distancia y el coche
+        svgContent += `<g id="distance-marker" visibility="hidden">
+            <line x1="${START_X}" y1="${Y_CENTER + 25}" x2="${END_X}" y2="${Y_CENTER + 25}" stroke="var(--accent-color)" stroke-width="2" stroke-dasharray="4 4"/>
+            <line x1="${START_X}" y1="${Y_CENTER + 20}" x2="${START_X}" y2="${Y_CENTER + 30}" stroke="var(--accent-color)" stroke-width="2"/>
+            <line x1="${END_X}" y1="${Y_CENTER + 20}" x2="${END_X}" y2="${Y_CENTER + 30}" stroke="var(--accent-color)" stroke-width="2"/>
+            <text x="${(START_X + END_X) / 2}" y="${Y_CENTER + 45}" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--accent-color)">Δx = 23 m</text>
+        </g>`;
+        svgContent += `<text id="car" font-size="40" x="${START_X}" y="${Y_CENTER + 15}" text-anchor="middle">🚗</text>`;
+        svg.innerHTML = svgContent;
+
+        const car = document.getElementById('car');
+        const distanceMarker = document.getElementById('distance-marker');
+
+        function iniciarFrenado() {
+            btnStart.disabled = true;
+            descriptionBox.innerHTML = "Frenando...";
+            car.style.transition = "x 2s ease-out";
+            car.setAttribute('x', END_X);
+
+            setTimeout(() => {
+                descriptionBox.innerHTML = "¡El coche se ha detenido!";
+                distanceMarker.setAttribute('visibility', 'visible');
+            }, 2000); // Coincide con la duración de la transición
+        }
+
+        function reiniciar() {
+            btnStart.disabled = false;
+            car.style.transition = "none";
+            car.setAttribute('x', START_X);
+            distanceMarker.setAttribute('visibility', 'hidden');
+            descriptionBox.innerHTML = "Presiona 'Iniciar Frenado' para ver la animación.";
+        }
+
+        btnStart.addEventListener('click', iniciarFrenado);
+        btnReset.addEventListener('click', reiniciar);
+        
+        reiniciar(); // Establecer el estado inicial
+    });
+    </script>
+
+</body>
+</html>

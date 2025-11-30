@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Movimiento con Aceleración Variable</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #8e44ad; --accent-color-dark: #7d3c98; --particle-color: #e67e22; --vector-color: #2980b9; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #grafica-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 600px; height: auto; aspect-ratio: 3/1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #f4ecf7; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #f4ecf7; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Movimiento con Aceleración Variable</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>La posición de una partícula que se mueve sobre el eje x viene dada por la ecuación $x(t) = t^3 - 9t^2 + 24t + 4$, donde $x$ está en metros y $t$ en segundos.</p>
+            <ul>
+                <li><strong>1. Funciones de Movimiento:</strong> Determine las expresiones para la velocidad instantánea $v(t)$ y la aceleración instantánea $a(t)$.</li>
+                <li><strong>2. Desplazamiento:</strong> Calcule el desplazamiento de la partícula en el intervalo de $t=0 \text{ s}$ a $t=5 \text{ s}$.</li>
+                <li><strong>3. Distancia Total:</strong> Calcule la distancia total recorrida por la partícula en el mismo intervalo de $t=0 \text{ s}$ a $t=5 \text{ s}$.</li>
+            </ul>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Visualización del Movimiento en el Eje X</h2>
+            <div id="anim-description"></div>
+            <svg id="grafica-svg" viewBox="0 0 600
+ 180"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>1. Funciones de Velocidad y Aceleración</h3>
+            <p>Obtenemos $v(t)$ derivando $x(t)$ y $a(t)$ derivando $v(t)$ con respecto al tiempo.</p>
+            <div class="formula-box">
+                <strong>Velocidad:</strong> $v(t) = \frac{dx}{dt} = 3t^2 - 18t + 24$<br>
+                <strong>Aceleración:</strong> $a(t) = \frac{dv}{dt} = 6t - 18$
+            </div>
+
+            <h3>2. Desplazamiento en [0s, 5s]</h3>
+            <p>El desplazamiento es $\Delta x = x(5) - x(0)$. Primero calculamos las posiciones.</p>
+            <div class="formula-box">
+                $x(0) = (0)^3 - 9(0)^2 + 24(0) + 4 = 4 \text{ m}$<br>
+                $x(5) = (5)^3 - 9(5)^2 + 24(5) + 4 = 125 - 225 + 120 + 4 = 24 \text{ m}$<br>
+                <strong>Desplazamiento:</strong> $\Delta x = 24 \text{ m} - 4 \text{ m} = 20 \text{ m}$
+            </div>
+
+            <h3>3. Distancia Total Recorrida en [0s, 5s]</h3>
+            <p>Para la distancia, debemos ver si la partícula cambia de dirección. Esto ocurre cuando $v(t)=0$.</p>
+            <div class="formula-box">
+                $3t^2 - 18t + 24 = 0 \implies t^2 - 6t + 8 = 0$<br>
+                $(t-2)(t-4) = 0 \implies t=2 \text{ s y } t=4 \text{ s}$
+            </div>
+            <p>La partícula cambia de dirección en $t=2$ y $t=4$. Debemos sumar las distancias de los tramos [0,2], [2,4] y [4,5].</p>
+            <div class="formula-box">
+                $x(2) = (2)^3 - 9(2)^2 + 24(2) + 4 = 24 \text{ m}$<br>
+                $x(4) = (4)^3 - 9(4)^2 + 24(4) + 4 = 20 \text{ m}$<br><br>
+                $d_1 = |x(2) - x(0)| = |24 - 4| = 20 \text{ m}$<br>
+                $d_2 = |x(4) - x(2)| = |20 - 24| = 4 \text{ m}$<br>
+                $d_3 = |x(5) - x(4)| = |24 - 20| = 4 \text{ m}$<br>
+                <strong>Distancia Total:</strong> $d_{total} = 20 + 4 + 4 = 28 \text{ m}$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuestas Finales</h2>
+            <p class="respuesta-item"><strong>Funciones:</strong> $v(t) = 3t^2 - 18t + 24$, $a(t) = 6t - 18$</p>
+            <p class="respuesta-item"><strong>Desplazamiento [0s, 5s]:</strong> 20 m</p>
+            <p class="respuesta-item"><strong>Distancia Total [0s, 5s]:</strong> 28 m</p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('grafica-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const animationSteps = [
+            { t: 0, x: 4, desc: "<strong>t=0s:</strong> La partícula inicia en x = 4 m." },
+            { t: 2, x: 24, desc: "<strong>t=2s:</strong> La partícula se detiene (v=0) en x = 24 m y cambia de dirección." },
+            { t: 4, x: 20, desc: "<strong>t=4s:</strong> Se detiene de nuevo (v=0) en x = 20 m y vuelve a cambiar de dirección." },
+            { t: 5, x: 24, desc: "<strong>t=5s:</strong> Fin del intervalo. La partícula está en x = 24 m." }
+        ];
+
+        const SVG_WIDTH = 600, SVG_HEIGHT = 180;
+        const MARGIN = { top: 70, right: 40, bottom: 50, left: 40 };
+        const G_WIDTH = SVG_WIDTH - MARGIN.left - MARGIN.right;
+        const Y_CENTER = MARGIN.top + (SVG_HEIGHT - MARGIN.top - MARGIN.bottom) / 2;
+
+        const xMin = 0, xMax = 30;
+        const scaleX = x => MARGIN.left + ((x - xMin) / (xMax - xMin)) * G_WIDTH;
+
+        let svgContent = `<g class="axis">
+            <line x1="${MARGIN.left}" y1="${Y_CENTER}" x2="${MARGIN.left + G_WIDTH}" y2="${Y_CENTER}" stroke="#333" stroke-width="2" />
+            <text x="${MARGIN.left + G_WIDTH + 15}" y="${Y_CENTER + 5}" font-size="14" font-family="Oswald">x (m)</text>`;
+        for (let i = xMin; i <= xMax; i += 5) {
+            svgContent += `<line x1="${scaleX(i)}" y1="${Y_CENTER - 5}" x2="${scaleX(i)}" y2="${Y_CENTER + 5}" stroke="#333" />
+                           <text x="${scaleX(i)}" y="${Y_CENTER + 25}" text-anchor="middle" font-size="12">${i}</text>`;
+        }
+        svgContent += `</g>`;
+        
+        svgContent += `<g id="displacement-vector" visibility="hidden">
+            <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--vector-color)"/></marker></defs>
+            <line x1="0" y1="0" x2="0" y2="0" stroke="var(--vector-color)" stroke-width="3" marker-end="url(#arrowhead)"/>
+            <text x="0" y="0" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--vector-color)"></text>
+        </g>`;
+        svgContent += `<circle id="particle" r="8" fill="var(--particle-color)" style="transition: cx 0.8s ease-in-out;"/>`;
+        svg.innerHTML = svgContent;
+
+        const particle = document.getElementById('particle');
+        const vectorGroup = document.getElementById('displacement-vector');
+        const vectorLine = vectorGroup.querySelector('line');
+        const vectorText = vectorGroup.querySelector('text');
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+
+            descriptionBox.innerHTML = step.desc;
+            particle.setAttribute('cx', scaleX(step.x));
+            particle.setAttribute('cy', Y_CENTER);
+
+            if (stepIndex > 0) {
+                const prevStep = animationSteps[stepIndex - 1];
+                const startX = scaleX(prevStep.x);
+                const endX = scaleX(step.x);
+                const deltaX = step.x - prevStep.x;
+
+                vectorGroup.setAttribute('visibility', 'visible');
+                vectorLine.setAttribute('x1', startX);
+                vectorLine.setAttribute('y1', Y_CENTER - 35);
+                vectorLine.setAttribute('x2', endX);
+                vectorLine.setAttribute('y2', Y_CENTER - 35);
+                
+                vectorText.setAttribute('x', (startX + endX) / 2);
+                vectorText.setAttribute('y', Y_CENTER - 45);
+                vectorText.textContent = `d = ${Math.abs(deltaX)} m`;
+            } else {
+                vectorGroup.setAttribute('visibility', 'hidden');
+            }
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

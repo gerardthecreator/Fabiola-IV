@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Movimiento con Ecuación</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #27ae60; --accent-color-dark: #229954; --particle-color: #c0392b; --vector-color: #2980b9; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #grafica-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 600px; height: auto; aspect-ratio: 4/1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #e8f8f5; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #e8f8f5; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Análisis de Movimiento con Ecuación</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Una partícula se mueve a lo largo del eje x de acuerdo a la expresión $x(t) = -4t + 2t^2$, donde $x$ está en metros y $t$ en segundos.</p>
+            <ul>
+                <li>Determine el <strong>desplazamiento</strong> y la <strong>velocidad promedio</strong> para los siguientes intervalos de tiempo:</li>
+                <ol>
+                    <li>$t = 0.0 \text{ s}$ a $t = 1.0 \text{ s}$</li>
+                    <li>$t = 1.0 \text{ s}$ a $t = 3.0 \text{ s}$</li>
+                </ol>
+            </ul>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Visualización del Movimiento en el Eje X</h2>
+            <div id="anim-description"></div>
+            <svg id="grafica-svg" viewBox="0 0 600 150"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>Paso 1: Calcular las posiciones en los instantes clave</h3>
+            <p>Primero, usamos la ecuación $x(t) = -4t + 2t^2$ para encontrar dónde está la partícula en $t=0$, $t=1$ y $t=3$.</p>
+            <div class="formula-box">
+                $x(0) = -4(0) + 2(0)^2 = 0 \text{ m}$<br>
+                $x(1) = -4(1) + 2(1)^2 = -4 + 2 = -2 \text{ m}$<br>
+                $x(3) = -4(3) + 2(3)^2 = -12 + 18 = 6 \text{ m}$
+            </div>
+
+            <h3>Paso 2: Análisis del Intervalo [0s, 1s]</h3>
+            <p>Calculamos el desplazamiento ($\Delta x = x_f - x_i$) y la velocidad promedio ($\bar{v} = \Delta x / \Delta t$).</p>
+            <div class="formula-box">
+                <strong>Desplazamiento:</strong> $\Delta x_1 = x(1) - x(0) = -2 \text{ m} - 0 \text{ m} = -2 \text{ m}$<br>
+                <strong>Velocidad Promedio:</strong> $\bar{v}_1 = \frac{\Delta x_1}{\Delta t_1} = \frac{-2 \text{ m}}{1.0 \text{ s} - 0.0 \text{ s}} = -2.0 \text{ m/s}$
+            </div>
+
+            <h3>Paso 3: Análisis del Intervalo [1s, 3s]</h3>
+            <p>Repetimos el proceso para el segundo intervalo.</p>
+            <div class="formula-box">
+                <strong>Desplazamiento:</strong> $\Delta x_2 = x(3) - x(1) = 6 \text{ m} - (-2 \text{ m}) = 8 \text{ m}$<br>
+                <strong>Velocidad Promedio:</strong> $\bar{v}_2 = \frac{\Delta x_2}{\Delta t_2} = \frac{8 \text{ m}}{3.0 \text{ s} - 1.0 \text{ s}} = \frac{8 \text{ m}}{2.0 \text{ s}} = 4.0 \text{ m/s}$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuestas Finales</h2>
+            <p class="respuesta-item"><strong>Intervalo [0s, 1s]:</strong><br>Desplazamiento = -2 m, Velocidad Promedio = -2.0 m/s</p>
+            <p class="respuesta-item"><strong>Intervalo [1s, 3s]:</strong><br>Desplazamiento = 8 m, Velocidad Promedio = 4.0 m/s</p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Lógica de la Gráfica SVG Interactiva ---
+        const svg = document.getElementById('grafica-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const animationSteps = [
+            { t: 0, x: 0, desc: "<strong>Estado Inicial (t=0s):</strong> La partícula está en el origen, x = 0 m." },
+            { t: 1, x: -2, desc: "<strong>Fin del Intervalo 1 (t=1s):</strong> La partícula se ha movido a x = -2 m.<br>Desplazamiento Δx = -2 m." },
+            { t: 3, x: 6, desc: "<strong>Fin del Intervalo 2 (t=3s):</strong> La partícula ahora está en x = 6 m.<br>Desplazamiento Δx = +8 m." }
+        ];
+
+        const SVG_WIDTH = 600, SVG_HEIGHT = 150;
+        const MARGIN = { top: 60, right: 40, bottom: 50, left: 40 };
+        const G_WIDTH = SVG_WIDTH - MARGIN.left - MARGIN.right;
+        const Y_CENTER = MARGIN.top + (SVG_HEIGHT - MARGIN.top - MARGIN.bottom) / 2;
+
+        const xMin = -4, xMax = 8;
+        const scaleX = x => MARGIN.left + ((x - xMin) / (xMax - xMin)) * G_WIDTH;
+
+        // Dibujar Eje X
+        let svgContent = `<g class="axis">
+            <line x1="${MARGIN.left}" y1="${Y_CENTER}" x2="${MARGIN.left + G_WIDTH}" y2="${Y_CENTER}" stroke="#333" stroke-width="2" />
+            <text x="${MARGIN.left + G_WIDTH + 15}" y="${Y_CENTER + 5}" font-size="14" font-family="Oswald">x (m)</text>`;
+        for (let i = xMin; i <= xMax; i += 2) {
+            svgContent += `<line x1="${scaleX(i)}" y1="${Y_CENTER - 5}" x2="${scaleX(i)}" y2="${Y_CENTER + 5}" stroke="#333" />
+                           <text x="${scaleX(i)}" y="${Y_CENTER + 25}" text-anchor="middle" font-size="12">${i}</text>`;
+        }
+        svgContent += `</g>`;
+        
+        // Placeholders para la partícula y el vector
+        svgContent += `<g id="displacement-vector" visibility="hidden">
+            <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--vector-color)"/></marker></defs>
+            <line x1="0" y1="0" x2="0" y2="0" stroke="var(--vector-color)" stroke-width="3" marker-end="url(#arrowhead)"/>
+            <text x="0" y="0" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--vector-color)"></text>
+        </g>`;
+        svgContent += `<circle id="particle" r="8" fill="var(--particle-color)" style="transition: cx 0.8s ease-in-out;"/>`;
+        svg.innerHTML = svgContent;
+
+        const particle = document.getElementById('particle');
+        const vectorGroup = document.getElementById('displacement-vector');
+        const vectorLine = vectorGroup.querySelector('line');
+        const vectorText = vectorGroup.querySelector('text');
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+
+            descriptionBox.innerHTML = step.desc;
+            particle.setAttribute('cx', scaleX(step.x));
+            particle.setAttribute('cy', Y_CENTER);
+
+            if (stepIndex > 0) {
+                const prevStep = animationSteps[stepIndex - 1];
+                const startX = scaleX(prevStep.x);
+                const endX = scaleX(step.x);
+                const deltaX = step.x - prevStep.x;
+
+                vectorGroup.setAttribute('visibility', 'visible');
+                vectorLine.setAttribute('x1', startX);
+                vectorLine.setAttribute('y1', Y_CENTER - 25);
+                vectorLine.setAttribute('x2', endX);
+                vectorLine.setAttribute('y2', Y_CENTER - 25);
+                
+                vectorText.setAttribute('x', (startX + endX) / 2);
+                vectorText.setAttribute('y', Y_CENTER - 35);
+                vectorText.textContent = `Δx = ${deltaX} m`;
+            } else {
+                vectorGroup.setAttribute('visibility', 'hidden');
+            }
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

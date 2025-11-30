@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo Interactivo: Lanzamiento de Cohete</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                macros: {
+                    yuno: 'y_1',
+                    vuno: 'v_1',
+                    ymax: 'y_{\\text{max}}',
+                    ttotal: 't_{\\text{total}}'
+                }
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #16a085; --accent-color-dark: #117a65; --vector-color-v1: #2980b9; --height-color: #8e44ad; --trajectory-color1: #d35400; --trajectory-color2: #c0392b; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        ul { list-style-position: inside; padding-left: 1rem; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        #visualizacion-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+        #vector-canvas { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1/1; cursor: grab; }
+        #vector-canvas:active { cursor: grabbing; }
+        .zoom-controls { position: absolute; top: 1.25rem; right: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .zoom-btn { width: 35px; height: 35px; font-size: 1.5rem; font-weight: bold; border: none; border-radius: 50%; background: var(--bg-color); box-shadow: 3px 3px 6px #bebebe, -3px -3px 6px #ffffff; cursor: pointer; transition: all 0.2s ease; }
+        .zoom-btn:hover { color: var(--accent-color); }
+        .zoom-btn:active, .zoom-btn:focus { box-shadow: inset 2px 2px 4px #bebebe, inset -2px -2px 4px #ffffff; outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .controls { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+        .control-btn { font-family: var(--font-body); font-size: 0.9rem; font-weight: 400; padding: 0.6rem 1rem; border: none; border-radius: 0.6rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .control-btn:hover { color: var(--accent-color); }
+        .control-btn:active, .control-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .control-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #e8f6f3; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+        @media (max-width: 640px) { body { padding: 0.8rem; } h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } .card { padding: 1.25rem; } .controls { flex-direction: column; width: 100%; } .control-btn { width: 100%; } .zoom-controls { top: 1rem; right: 1rem; } .zoom-btn { width: 30px; height: 30px; font-size: 1.2rem; } }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1 id="main-title"></h1>
+        <section id="enunciado-container" class="card"></section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Visualización de la Trayectoria</h2>
+            <canvas id="vector-canvas" width="500" height="500"></canvas>
+            <div class="zoom-controls">
+                <button id="btn-zoom-in" class="zoom-btn" aria-label="Acercar visualización">+</button>
+                <button id="btn-zoom-out" class="zoom-btn" aria-label="Alejar visualización">-</button>
+            </div>
+            <div class="controls">
+                <button id="btn-step1" class="control-btn">1. Fin del Impulso (t=20s)</button>
+                <button id="btn-step2" class="control-btn" disabled>2. Mostrar Altura Máxima</button>
+                <button id="btn-step3" class="control-btn" disabled>3. Indicar Tiempos de Vuelo</button>
+                <button id="btn-reset" class="control-btn">Reiniciar</button>
+            </div>
+        </section>
+
+        <section id="solucion-container" class="card"></section>
+        <section id="respuestas-container" class="card" aria-live="polite"></section>
+    </main>
+
+    <!-- TEMPLATES PARA CONTENIDO DINÁMICO -->
+    <template id="template-enunciado"><h2 class="enunciado-titulo"></h2><div class="enunciado-parrafos"></div></template>
+    <template id="template-solucion"><div class="step-card"><h3 class="solucion-step-titulo"></h3><p class="solucion-step-explicacion"></p><div class="formula-box solucion-step-formula"></div></div></template>
+    <template id="template-respuesta"><p class="respuesta-item"></p></template>
+
+    <script>
+    const ejercicioCohete = {
+        titulo: "Ejercicio: Lanzamiento de un Cohete",
+        enunciado: {
+            titulo: "Enunciado",
+            parrafos: [
+                "<p>Un pequeño cohete despega verticalmente desde el reposo y sube con una aceleración de $6.0 \\ \\text{m/s}^2$ durante 20 segundos. Luego, el cohete apaga sus motores y continúa subiendo hasta una altura máxima.</p>" +
+                "<ul>" +
+                "<li>a) ¿Cuánta altura alcanza durante los primeros 20 segundos?</li>" +
+                "<li>b) ¿Cuál es el vector velocidad al cabo de esos 20 segundos?</li>" +
+                "<li>c) ¿Cuál es la máxima altura alcanzada?</li>" +
+                "<li>d) ¿Cuánto tiempo dura el cohete en el aire?</li>" +
+                "</ul>"
+            ]
+        },
+        solucion: {
+            titulo: "Solución Detallada",
+            pasos: [
+                {
+                    titulo: "Fase 1: Ascenso con Motor (t = 0 a 20s)",
+                    explicacion: "En esta primera fase, el cohete tiene una aceleración constante hacia arriba. Partimos del reposo ($v_0=0, y_0=0$).",
+                    formula: `Datos: $v_0 = 0 \\ \\text{m/s}$, $a = +6.0 \\ \\text{m/s}^2$, $t = 20 \\ \\text{s}$`
+                },
+                {
+                    titulo: "a) Altura a los 20 segundos ($\yuno$)",
+                    explicacion: "Usamos la ecuación de posición para un MRUA.",
+                    formula: `$\\yuno = y_0 + v_0 t + \\frac{1}{2}at^2$<br>
+                              $\\yuno = 0 + 0(20) + \\frac{1}{2}(6.0)(20)^2$<br>
+                              $\\yuno = 3.0 \\times 400 = 1200 \\ \\text{m}$`
+                },
+                {
+                    titulo: "b) Velocidad a los 20 segundos ($vuno$)",
+                    explicacion: "Calculamos la velocidad final de esta fase, que será la velocidad inicial de la siguiente fase.",
+                    formula: `$\\vuno = v_0 + at = 0 + (6.0)(20) = 120 \\ \\text{m/s}$<br>
+                              Como vector: $\\vec{v}_1 = (120 \\hat{j}) \\ \\text{m/s}$`
+                },
+                {
+                    titulo: "Fase 2: Vuelo Libre (t > 20s)",
+                    explicacion: "Al apagarse el motor, el cohete está en caída libre. Su única aceleración es la gravedad ($g = -9.8 \\ \\text{m/s}^2$). Las condiciones iniciales para esta fase son la altura y velocidad calculadas en la fase 1.",
+                    formula: `Datos: $y_{0,2} = 1200 \\ \\text{m}$, $v_{0,2} = 120 \\ \\text{m/s}$, $a = -9.8 \\ \\text{m/s}^2$`
+                },
+                {
+                    titulo: "c) Altura Máxima Alcanzada ($\ymax$)",
+                    explicacion: "La altura máxima se alcanza cuando la velocidad vertical es cero. Calculamos la altura adicional ($\Delta y_2$) que sube el cohete durante esta fase.",
+                    formula: `$v_f^2 = v_i^2 + 2a \\Delta y_2$<br>
+                              $0^2 = (120)^2 + 2(-9.8) \\Delta y_2$<br>
+                              $0 = 14400 - 19.6 \\Delta y_2 \\implies \\Delta y_2 = \\frac{14400}{19.6} \\approx 734.7 \\ \\text{m}$<br>
+                              $\\ymax = \\yuno + \\Delta y_2 = 1200 + 734.7 = 1934.7 \\ \\text{m}$`
+                },
+                {
+                    titulo: "d) Tiempo Total en el Aire ($\ttotal$)",
+                    explicacion: "El tiempo total es la suma del tiempo de la fase 1 ($t_1$), el tiempo de subida en fase 2 ($t_{subida}$), y el tiempo de caída desde la altura máxima ($t_{caida}$).",
+                    formula: `$t_1 = 20 \\ \\text{s}$<br>
+                              $t_{subida}: v_f = v_i + at \\implies 0 = 120 - 9.8 t_{subida} \\implies t_{subida} \\approx 12.24 \\ \\text{s}$<br>
+                              $t_{caida}: y_f = y_i + v_i t + \\frac{1}{2}at^2 \\implies 0 = 1934.7 + 0 - 4.9 t_{caida}^2 \\implies t_{caida} \\approx 19.87 \\ \\text{s}$<br>
+                              $\\ttotal = t_1 + t_{subida} + t_{caida} = 20 + 12.24 + 19.87 = 52.11 \\ \\text{s}$`
+                }
+            ]
+        },
+        respuestas: {
+            titulo: "Respuestas Finales",
+            items: [
+                "<strong>a) Altura a los 20s:</strong> <div class='formula-box'>$y_1 = 1200 \\ \\text{m}$</div>",
+                "<strong>b) Velocidad a los 20s:</strong> <div class='formula-box'>$\\vec{v}_1 = (120 \\hat{j}) \\ \\text{m/s}$</div>",
+                "<strong>c) Altura máxima:</strong> <div class='formula-box'>$y_{\\text{max}} = 1934.7 \\ \\text{m}$</div>",
+                "<strong>d) Tiempo total en el aire:</strong> <div class='formula-box'>$t_{\\text{total}} = 52.11 \\ \\text{s}$</div>"
+            ]
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const elementosParaRenderizar = [];
+
+        function poblarContenido() {
+            const data = ejercicioCohete;
+            document.getElementById('main-title').innerHTML = data.titulo;
+
+            const enunciadoContainer = document.getElementById('enunciado-container');
+            const enunciadoTemplate = document.getElementById('template-enunciado');
+            const enunciadoClone = enunciadoTemplate.content.cloneNode(true);
+            enunciadoClone.querySelector('.enunciado-titulo').innerHTML = data.enunciado.titulo;
+            const parrafosDiv = enunciadoClone.querySelector('.enunciado-parrafos');
+            data.enunciado.parrafos.forEach(p => {
+                const pElem = document.createElement('div');
+                pElem.innerHTML = p;
+                parrafosDiv.appendChild(pElem);
+            });
+            enunciadoContainer.appendChild(enunciadoClone);
+            elementosParaRenderizar.push(enunciadoContainer);
+
+            const solucionContainer = document.getElementById('solucion-container');
+            const solucionTemplate = document.getElementById('template-solucion');
+            const solucionHeader = document.createElement('h2');
+            solucionHeader.textContent = data.solucion.titulo;
+            solucionContainer.appendChild(solucionHeader);
+            data.solucion.pasos.forEach(step => {
+                const stepClone = solucionTemplate.content.cloneNode(true);
+                stepClone.querySelector('.solucion-step-titulo').innerHTML = step.titulo;
+                stepClone.querySelector('.solucion-step-explicacion').innerHTML = step.explicacion;
+                if (step.formula) { stepClone.querySelector('.solucion-step-formula').innerHTML = step.formula; } else { stepClone.querySelector('.formula-box').remove(); }
+                solucionContainer.appendChild(stepClone);
+            });
+            elementosParaRenderizar.push(solucionContainer);
+
+            const respuestasContainer = document.getElementById('respuestas-container');
+            const respuestaTemplate = document.getElementById('template-respuesta');
+            const respuestasHeader = document.createElement('h2');
+            respuestasHeader.textContent = data.respuestas.titulo;
+            respuestasContainer.appendChild(respuestasHeader);
+            data.respuestas.items.forEach(item => {
+                const itemClone = respuestaTemplate.content.cloneNode(true);
+                itemClone.querySelector('.respuesta-item').innerHTML = item;
+                respuestasContainer.appendChild(itemClone);
+            });
+            elementosParaRenderizar.push(respuestasContainer);
+        }
+
+        function renderizarFormulas() {
+            if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) {
+                MathJax.typesetPromise(elementosParaRenderizar).catch((err) => console.error("Error al renderizar MathJax:", err));
+            }
+        }
+
+        poblarContenido();
+        document.addEventListener('MathJaxReady', renderizarFormulas);
+        if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) {
+            renderizarFormulas();
+        }
+
+        // --- Lógica del Canvas ---
+        const canvas = document.getElementById('vector-canvas');
+        const ctx = canvas.getContext('2d');
+        const btns = { 
+            step1: document.getElementById('btn-step1'), 
+            step2: document.getElementById('btn-step2'), 
+            step3: document.getElementById('btn-step3'),
+            reset: document.getElementById('btn-reset'), 
+            zoomIn: document.getElementById('btn-zoom-in'), 
+            zoomOut: document.getElementById('btn-zoom-out') 
+        };
+        
+        const Y1_HEIGHT = 1200;
+        const V1_VECTOR = { x: 0, y: 120 };
+        const Y_MAX_HEIGHT = 1934.7;
+        const T1 = 20;
+        const T_TOTAL = 52.11;
+        const T_PEAK = 32.24;
+        
+        const ESCALA_BASE = 0.2; // Escala para que ~2000m quepan en el canvas
+        let scale = 1.0;
+        const ORIGEN = { x: canvas.width / 2, y: canvas.height - 40 };
+        let drawnItems = [];
+
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            dibujarEjes();
+            drawnItems.forEach(item => {
+                if (item.type === 'trajectory') drawTrajectory(item.y1, item.yMax, item.color1, item.color2);
+                if (item.type === 'height_marker') drawHeightMarker(item.y, item.label, item.color);
+                if (item.type === 'vector') drawVector(item.vector, item.startPoint, item.label, item.color);
+                if (item.type === 'time_marker') drawTimeMarker(item.y, item.label, item.color);
+            });
+        }
+
+        function dibujarEjes() {
+            ctx.save();
+            ctx.translate(ORIGEN.x, ORIGEN.y);
+            ctx.strokeStyle = '#aaa';
+            ctx.lineWidth = 1 / scale;
+            ctx.setLineDash([5 / scale, 5 / scale]);
+            ctx.beginPath();
+            ctx.moveTo(-canvas.width, 0); ctx.lineTo(canvas.width, 0);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = `${14 / scale}px Oswald`;
+            ctx.fillStyle = '#555';
+            ctx.fillText('Suelo (y=0)', -ORIGEN.x + 10, 20/scale);
+            ctx.restore();
+        }
+
+        function drawTrajectory(y1, yMax, color1, color2) {
+            const currentScale = ESCALA_BASE * scale;
+            const y1_px = y1 * currentScale;
+            const yMax_px = yMax * currentScale;
+            ctx.save();
+            ctx.translate(ORIGEN.x, ORIGEN.y);
+            // Fase 1: Impulso
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -y1_px);
+            ctx.strokeStyle = color1;
+            ctx.lineWidth = 4 / scale;
+            ctx.stroke();
+            // Fase 2: Vuelo libre
+            ctx.beginPath();
+            ctx.moveTo(0, -y1_px);
+            ctx.lineTo(0, -yMax_px);
+            ctx.setLineDash([6/scale, 6/scale]);
+            ctx.strokeStyle = color2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawHeightMarker(y, label, color) {
+            const currentScale = ESCALA_BASE * scale;
+            const y_px = y * currentScale;
+            ctx.save();
+            ctx.translate(ORIGEN.x, ORIGEN.y);
+            ctx.beginPath();
+            ctx.moveTo(-20/scale, -y_px);
+            ctx.lineTo(20/scale, -y_px);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2 / scale;
+            ctx.stroke();
+            ctx.font = `bold ${14/scale}px Oswald`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'left';
+            ctx.fillText(label, 30/scale, -y_px + 5/scale);
+            ctx.restore();
+        }
+        
+        function drawVector(vector, startPoint, label, color) {
+            const currentScale = ESCALA_BASE * scale;
+            ctx.save();
+            ctx.translate(ORIGEN.x, ORIGEN.y);
+            ctx.scale(1, -1);
+            const startX = 0;
+            const startY = startPoint.y * currentScale;
+            const endY = startY + vector.y * currentScale * 2; // Multiplicador para que sea visible
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(startX, endY);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3 / scale;
+            ctx.stroke();
+            ctx.save();
+            ctx.translate(startX, endY);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(0, 0); ctx.lineTo(-10/scale, 5/scale); ctx.lineTo(-10/scale, -5/scale); ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+            ctx.scale(1, -1);
+            ctx.font = `bold ${16/scale}px Oswald`;
+            ctx.fillStyle = color;
+            ctx.fillText(label, startX + 15/scale, -endY);
+            ctx.restore();
+        }
+        
+        function drawTimeMarker(y, label, color) {
+            const currentScale = ESCALA_BASE * scale;
+            const y_px = y * currentScale;
+            ctx.save();
+            ctx.translate(ORIGEN.x, ORIGEN.y);
+            ctx.font = `bold ${14/scale}px Oswald`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'right';
+            ctx.fillText(label, -30/scale, -y_px + 5/scale);
+            ctx.restore();
+        }
+
+        function resetCanvas() {
+            scale = 1.0;
+            drawnItems = [];
+            redrawCanvas();
+            btns.step1.disabled = false;
+            btns.step2.disabled = true;
+            btns.step3.disabled = true;
+        }
+
+        btns.step1.addEventListener('click', () => {
+            drawnItems.push({type: 'trajectory', y1: Y1_HEIGHT, yMax: Y1_HEIGHT, color1: 'var(--trajectory-color1)', color2: 'var(--trajectory-color2)'});
+            drawnItems.push({type: 'height_marker', y: Y1_HEIGHT, label: `y₁ = ${Y1_HEIGHT} m`, color: 'var(--height-color)'});
+            drawnItems.push({type: 'vector', vector: V1_VECTOR, startPoint: {y: Y1_HEIGHT}, label: 'v₁', color: 'var(--vector-color-v1)'});
+            redrawCanvas();
+            btns.step1.disabled = true;
+            btns.step2.disabled = false;
+        });
+
+        btns.step2.addEventListener('click', () => {
+            // Actualiza la trayectoria para mostrar la fase 2
+            drawnItems[0].yMax = Y_MAX_HEIGHT;
+            drawnItems.push({type: 'height_marker', y: Y_MAX_HEIGHT, label: `y_max = ${Y_MAX_HEIGHT.toFixed(1)} m`, color: 'var(--height-color)'});
+            redrawCanvas();
+            btns.step2.disabled = true;
+            btns.step3.disabled = false;
+        });
+
+        btns.step3.addEventListener('click', () => {
+            drawnItems.push({type: 'time_marker', y: Y1_HEIGHT, label: `t = ${T1.toFixed(2)} s`, color: '#333'});
+            drawnItems.push({type: 'time_marker', y: Y_MAX_HEIGHT, label: `t = ${T_PEAK.toFixed(2)} s`, color: '#333'});
+            drawnItems.push({type: 'time_marker', y: 0, label: `t = ${T_TOTAL.toFixed(2)} s`, color: '#333'});
+            redrawCanvas();
+            btns.step3.disabled = true;
+        });
+
+        btns.reset.addEventListener('click', resetCanvas);
+        btns.zoomIn.addEventListener('click', () => { scale *= 1.25; redrawCanvas(); });
+        btns.zoomOut.addEventListener('click', () => { scale /= 1.25; redrawCanvas(); });
+
+        resetCanvas();
+    });
+    </script>
+
+</body>
+</html>

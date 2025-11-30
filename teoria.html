@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría y Fórmulas: Cinemática y Movimiento Relativo</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX (Configuración Segura y Probada) -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                // Macros con nombres seguros que no causan recursividad
+                macros: {
+                    V: ['\\vec{#1}', 1],
+                    ihat: '\\hat{i}',
+                    jhat: '\\hat{j}'
+                }
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #1abc9c; --accent-color-dark: #16a085; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; text-align: left; margin-top: 2.5rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; color: #2c3e50; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; /* <-- SOLUCIÓN PARA ECUACIONES LARGAS */ }
+        @media (max-width: 640px) { body { padding: 0.8rem; } h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } .card { padding: 1.25rem; } }
+    </style>
+</head>
+<body>
+
+    <main>
+        <div class="card">
+            <h1>Teoría de Cinemática y Movimiento Relativo</h1>
+            <p>Este documento consolida todos los conceptos teóricos y las fórmulas necesarias para resolver problemas de cinemática en dos dimensiones y movimiento relativo, como los vistos en los ejercicios anteriores.</p>
+        </div>
+
+        <section class="card">
+            <h2>1. Fundamentos de Cinemática Vectorial</h2>
+            <p>Para describir el movimiento en más de una dimensión, utilizamos vectores. Las cantidades cinemáticas básicas (posición, velocidad, aceleración) son vectores.</p>
+
+            <h3>Posición ($\V{r}$)</h3>
+            <p>El vector de posición localiza una partícula en el espacio con respecto a un origen. En un plano cartesiano, se expresa como:</p>
+            <div class="formula-box">$\V{r} = x\ihat + y\jhat$</div>
+
+            <h3>Desplazamiento ($\Delta\V{r}$)</h3>
+            <p>Es el cambio en el vector de posición. Representa la distancia y dirección en línea recta desde el punto inicial ($\V{r}_1$) al punto final ($\V{r}_2$).</p>
+            <div class="formula-box">$\Delta\V{r} = \V{r}_2 - \V{r}_1 = (x_2 - x_1)\ihat + (y_2 - y_1)\jhat$</div>
+
+            <h3>Velocidad Media ($\V{v}_m$)</h3>
+            <p>Es el desplazamiento total dividido por el intervalo de tiempo ($\Delta t$). Su dirección es la misma que la del vector de desplazamiento.</p>
+            <div class="formula-box">$\V{v}_m = \frac{\Delta\V{r}}{\Delta t}$</div>
+
+            <h3>Velocidad Instantánea ($\V{v}(t)$)</h3>
+            <p>Es la velocidad en un instante de tiempo específico. Se calcula como la <strong>derivada</strong> del vector de posición con respecto al tiempo.</p>
+            <div class="formula-box">$\V{v}(t) = \frac{d\V{r}(t)}{dt} = \frac{dx(t)}{dt}\ihat + \frac{dy(t)}{dt}\jhat$</div>
+
+            <h3>Aceleración Media ($\V{a}_m$)</h3>
+            <p>Es el cambio en el vector de velocidad ($\Delta\V{v}$) dividido por el intervalo de tiempo ($\Delta t$). Es importante notar que puede existir aceleración incluso si la rapidez es constante, siempre que la dirección de la velocidad cambie (como en una curva).</p>
+            <div class="formula-box">$\V{a}_m = \frac{\Delta\V{v}}{\Delta t} = \frac{\V{v}_2 - \V{v}_1}{\Delta t}$</div>
+
+            <h3>Aceleración Instantánea ($\V{a}(t)$)</h3>
+            <p>Es la aceleración en un instante de tiempo específico. Se calcula como la <strong>derivada</strong> del vector de velocidad con respecto al tiempo (o la segunda derivada de la posición).</p>
+            <div class="formula-box">$\V{a}(t) = \frac{d\V{v}(t)}{dt} = \frac{d^2\V{r}(t)}{dt^2}$</div>
+        </section>
+
+        <section class="card">
+            <h2>2. Movimiento Relativo</h2>
+            <p>El movimiento relativo es el estudio de cómo se mide la velocidad y la aceleración de un objeto desde diferentes marcos de referencia (observadores).</p>
+
+            <h3>Notación Clave</h3>
+            <p>La notación $\V{v}_{A/B}$ se lee como "la velocidad del objeto <strong>A</strong> medida por (o relativa a) el observador <strong>B</strong>".</p>
+            <ul>
+                <li>$\V{v}_{P/T}$: Velocidad del <strong>P</strong>royectil respecto a la <strong>T</strong>ierra (velocidad absoluta).</li>
+                <li>$\V{v}_{P/A}$: Velocidad del <strong>P</strong>royectil respecto al <strong>A</strong>ire (o agua, o cualquier medio móvil).</li>
+                <li>$\V{v}_{A/T}$: Velocidad del <strong>A</strong>ire respecto a la <strong>T</strong>ierra (velocidad del viento).</li>
+            </ul>
+
+            <h3>Ecuación Fundamental de Velocidad Relativa</h3>
+            <p>La velocidad absoluta de un objeto es la suma de su velocidad relativa a un marco móvil, más la velocidad de ese marco móvil respecto al marco fijo.</p>
+            <div class="formula-box">$\V{v}_{P/T} = \V{v}_{P/A} + \V{v}_{A/T}$</div>
+            <p>Esta ecuación es la piedra angular para resolver todos los problemas de movimiento relativo. Se puede reorganizar según lo que se necesite calcular.</p>
+
+            <h3>Ecuación Fundamental de Aceleración Relativa</h3>
+            <p>La misma lógica se aplica a la aceleración, asumiendo que los marcos de referencia no rotan.</p>
+            <div class="formula-box">$\V{a}_{P/T} = \V{a}_{P/A} + \V{a}_{A/T}$</div>
+
+            <h3>Encadenamiento de Marcos de Referencia</h3>
+            <p>Si hay múltiples cuerpos en movimiento, la ecuación se puede encadenar. Por ejemplo, para la velocidad de un helicóptero (H) respecto a tierra (T), medida por un avión (P) que a su vez se mide respecto a un portaaviones (A):</p>
+            <div class="formula-box">$\V{v}_{H/T} = \V{v}_{H/P} + \V{v}_{P/A} + \V{v}_{A/T}$</div>
+            <p>Observe cómo los subíndices internos "se cancelan" (H/<strong>P</strong> + <strong>P</strong>/<strong>A</strong> + <strong>A</strong>/T), dejando los subíndices externos (H/T).</p>
+        </section>
+
+        <section class="card">
+            <h2>3. Estrategia General para Resolver Problemas</h2>
+            <ol>
+                <li><strong>Definir un Sistema de Coordenadas:</strong> Generalmente, $\ihat$ para el Este y $\jhat$ para el Norte.</li>
+                <li><strong>Identificar Objetos y Marcos de Referencia:</strong> Nombrar cada objeto (avión, bote, tierra, aire, etc.).</li>
+                <li><strong>Escribir los Datos en Forma Vectorial:</strong> Convertir toda la información del problema (magnitudes y direcciones) en vectores con componentes $\ihat$ y $\jhat$. Asegurarse de que todas las unidades sean consistentes (ej. m/s y m/s²).</li>
+                <li><strong>Plantear la Ecuación Relativa Correcta:</strong> Escribir la ecuación fundamental de velocidad o aceleración que relacione las cantidades conocidas con la desconocida.</li>
+                <li><strong>Resolver por Componentes:</strong> Separar la ecuación vectorial en dos ecuaciones escalares (una para $\ihat$ y otra para $\jhat$) y resolver el sistema.</li>
+                <li><strong>Calcular Magnitud y Dirección:</strong> Si se pide, usar el teorema de Pitágoras y la arcotangente para encontrar el módulo y el ángulo del vector resultante.</li>
+                <li><strong>Verificar Cifras Significativas:</strong> Redondear la respuesta final de acuerdo con la precisión de los datos de entrada.</li>
+            </ol>
+        </section>
+        
+        <section class="card">
+            <h2>4. Apéndice: Notas Importantes</h2>
+            
+            <h3>Cifras Significativas</h3>
+            <p><strong>Multiplicación/División:</strong> El resultado debe tener el mismo número de cifras significativas que el dato con la menor cantidad de cifras significativas. <br><em>Ej: $16.7 / 5.0 = 3.34 \rightarrow 3.3$ (2 c.s.)</em></p>
+            <p><strong>Suma/Resta:</strong> El resultado debe tener el mismo número de posiciones decimales que el dato con la menor cantidad de posiciones decimales. <br><em>Ej: $12.55 + 2.1 = 14.65 \rightarrow 14.7$ (1 pos. decimal)</em></p>
+
+            <h3>Conversiones de Unidades Clave</h3>
+            <div class="formula-box">$$1 \text{ nudo} = 1.852 \text{ km/h}$$</div>
+            <div class="formula-box">$$1 \text{ km/h} = \frac{1}{3.6} \text{ m/s} \approx 0.2778 \text{ m/s}$$</div>
+            <div class="formula-box">$$1 \text{ nudo/min} = 1.852 \frac{\text{km/h}}{\text{min}} \times \frac{60 \text{ min}}{1 \text{ h}} = 111.12 \text{ km/h}^2$$</div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function renderizarFormulas() {
+                // Renderiza todo el contenido principal una vez que MathJax está listo
+                if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) {
+                    MathJax.typesetPromise([document.querySelector('main')])
+                        .catch((err) => console.error("Error al renderizar MathJax:", err));
+                }
+            }
+
+            // Escuchar el evento personalizado de MathJax
+            document.addEventListener('MathJaxReady', renderizarFormulas);
+            
+            // Si MathJax ya estaba listo (por caché), ejecutar la función
+            if (typeof MathJax !== 'undefined' && MathJax.startup.isReady) {
+                renderizarFormulas();
+            }
+        });
+    </script>
+
+</body>
+</html>

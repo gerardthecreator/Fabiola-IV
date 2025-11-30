@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio: Persecución en la Sabana</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #e67e22; --accent-color-dark: #d35400; --gacela-color: #27ae60; --guepardo-color: #c0392b; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #grafica-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 5/4; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #fef9e7; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #fef9e7; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Ejercicio: Persecución en la Sabana</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Un guepardo en reposo ($x=0$) ve a una gacela <strong>70 m</strong> más adelante. La gacela corre en línea recta con una velocidad constante de <strong>25 m/s</strong>. En el instante en que la gacela pasa por la marca de 70 m, el guepardo arranca desde el origen y acelera a <strong>4.0 m/s²</strong>.</p>
+            <ul>
+                <li>¿Cuánto tiempo tarda el guepardo en alcanzar a la gacela?</li>
+                <li>¿A qué distancia del punto de partida del guepardo ocurre el alcance?</li>
+                <li>¿Qué velocidad tiene el guepardo en ese instante?</li>
+            </ul>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Gráfica de Posición vs. Tiempo (x vs t)</h2>
+            <div id="anim-description">Presiona "Siguiente" para construir la gráfica.</div>
+            <svg id="grafica-svg" viewBox="0 0 500 400"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>1. Ecuaciones de Movimiento</h3>
+            <p>Establecemos el origen ($x=0$) en la posición inicial del guepardo. La gacela tiene una posición inicial de $x_0 = 70 \text{ m}$.</p>
+            <div class="formula-box">
+                <strong>Gacela (MRU):</strong> $x_G(t) = x_0 + v_G t = 70 + 25t$<br>
+                <strong>Guepardo (MRUA):</strong> $x_{Ch}(t) = \frac{1}{2}a_{Ch}t^2 = \frac{1}{2}(4.0)t^2 = 2.0t^2$
+            </div>
+
+            <h3>2. Tiempo de Alcance</h3>
+            <p>El alcance ocurre cuando las posiciones son iguales: $x_G(t) = x_{Ch}(t)$.</p>
+            <div class="formula-box">
+                $70 + 25t = 2.0t^2$<br>
+                $2.0t^2 - 25t - 70 = 0$
+            </div>
+            <p>Resolvemos esta ecuación cuadrática usando la fórmula $t = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$:</p>
+            <div class="formula-box">
+                $t = \frac{25 \pm \sqrt{(-25)^2 - 4(2.0)(-70)}}{2(2.0)} = \frac{25 \pm \sqrt{625 + 560}}{4} = \frac{25 \pm \sqrt{1185}}{4}$<br>
+                $t = \frac{25 \pm 34.4}{4} \implies t \approx 14.9 \text{ s}$ (la solución negativa no es física)
+            </div>
+
+            <h3>3. Distancia y Velocidad Final del Guepardo</h3>
+            <p>Usamos el tiempo de alcance para encontrar la distancia recorrida y la velocidad final del guepardo.</p>
+            <div class="formula-box">
+                <strong>Distancia:</strong> $x_{alcance} = 2.0t^2 = 2.0(14.9)^2 \approx 444 \text{ m}$<br>
+                <strong>Velocidad Final:</strong> $v_{Ch}(t) = a_{Ch}t = (4.0)(14.9) \approx 59.6 \text{ m/s}$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuestas Finales</h2>
+            <p class="respuesta-item"><strong>Tiempo de alcance:</strong> 14.9 segundos.</p>
+            <p class="respuesta-item"><strong>Distancia de alcance:</strong> 444 metros.</p>
+            <p class="respuesta-item"><strong>Velocidad final del guepardo:</strong> 59.6 m/s (o ~215 km/h).</p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('grafica-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const SVG_WIDTH = 500, SVG_HEIGHT = 400;
+        const MARGIN = { top: 40, right: 40, bottom: 40, left: 50 };
+        const G_WIDTH = SVG_WIDTH - MARGIN.left - MARGIN.right;
+        const G_HEIGHT = SVG_HEIGHT - MARGIN.top - MARGIN.bottom;
+
+        const tMax = 16, xMax = 500;
+        const scaleT = t => MARGIN.left + (t / tMax) * G_WIDTH;
+        const scaleX = x => MARGIN.top + G_HEIGHT - (x / xMax) * G_HEIGHT;
+
+        let svgContent = `<g class="axes">
+            <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + G_HEIGHT}" stroke="#333" />
+            <line x1="${MARGIN.left}" y1="${MARGIN.top + G_HEIGHT}" x2="${MARGIN.left + G_WIDTH}" y2="${MARGIN.top + G_HEIGHT}" stroke="#333" />
+            <text x="${MARGIN.left - 10}" y="${MARGIN.top - 10}" text-anchor="middle" font-size="14" font-family="Oswald">x (m)</text>
+            <text x="${MARGIN.left + G_WIDTH + 20}" y="${MARGIN.top + G_HEIGHT + 5}" font-size="14" font-family="Oswald">t (s)</text>`;
+        for (let t = 0; t <= tMax; t += 2) {
+            svgContent += `<text x="${scaleT(t)}" y="${MARGIN.top + G_HEIGHT + 20}" text-anchor="middle" font-size="12">${t}</text>`;
+        }
+        for (let x = 0; x <= xMax; x += 100) {
+            svgContent += `<text x="${MARGIN.left - 15}" y="${scaleX(x) + 4}" text-anchor="end" font-size="12">${x}</text>
+                           <line x1="${MARGIN.left}" y1="${scaleX(x)}" x2="${MARGIN.left + G_WIDTH}" y2="${scaleX(x)}" stroke="#ccc" stroke-dasharray="2 2"/>`;
+        }
+        svgContent += `</g>`;
+
+        svgContent += `<line id="gacela-path" x1="${scaleT(0)}" y1="${scaleX(70)}" x2="${scaleT(tMax)}" y2="${scaleX(70 + 25 * tMax)}" stroke="var(--gacela-color)" stroke-width="3" visibility="hidden" />`;
+        let cheetahPoints = "";
+        for (let t = 0; t <= 14.9; t += 0.5) { cheetahPoints += `${scaleT(t)},${scaleX(2 * t * t)} `; }
+        svgContent += `<polyline id="guepardo-path" points="${cheetahPoints}" stroke="var(--guepardo-color)" stroke-width="3" fill="none" visibility="hidden"/>`;
+        svgContent += `<g id="intersection-marker" visibility="hidden">
+            <circle cx="${scaleT(14.9)}" cy="${scaleX(444)}" r="6" fill="var(--accent-color)"/>
+            <line x1="${scaleT(14.9)}" y1="${MARGIN.top + G_HEIGHT}" x2="${scaleT(14.9)}" y2="${scaleX(444)}" stroke="var(--accent-color)" stroke-dasharray="4 4"/>
+            <line x1="${MARGIN.left}" y1="${scaleX(444)}" x2="${scaleT(14.9)}" y2="${scaleX(444)}" stroke="var(--accent-color)" stroke-dasharray="4 4"/>
+            <text x="${scaleT(14.9) - 10}" y="${scaleX(444) - 10}" font-size="14" font-weight="bold" fill="var(--accent-color)" text-anchor="end">(14.9s, 444m)</text>
+        </g>`;
+        svg.innerHTML = svgContent;
+
+        const gacelaPath = document.getElementById('gacela-path');
+        const guepardoPath = document.getElementById('guepardo-path');
+        const intersectionMarker = document.getElementById('intersection-marker');
+
+        const animationSteps = [
+            { desc: "Presiona 'Siguiente' para construir la gráfica." },
+            { desc: "<strong>Paso 1:</strong> Se dibuja la trayectoria de la gacela (línea verde), que empieza con una ventaja de 70m y se mueve a velocidad constante." },
+            { desc: "<strong>Paso 2:</strong> Se dibuja la trayectoria del guepardo (curva roja), que acelera desde el origen." },
+            { desc: "<strong>Paso 3:</strong> El punto donde se cruzan es la solución. Ocurre a los <strong>14.9 segundos</strong> y a <strong>444 metros</strong> del origen." }
+        ];
+
+        let currentStep = 0;
+
+        function updateVisualization(step) {
+            btnPrev.disabled = step === 0;
+            btnNext.disabled = step === animationSteps.length - 1;
+            descriptionBox.innerHTML = animationSteps[step].desc;
+
+            gacelaPath.setAttribute('visibility', step >= 1 ? 'visible' : 'hidden');
+            guepardoPath.setAttribute('visibility', step >= 2 ? 'visible' : 'hidden');
+            intersectionMarker.setAttribute('visibility', step >= 3 ? 'visible' : 'hidden');
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>
