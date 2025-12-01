@@ -16,7 +16,9 @@
     <!-- Estilos para el menú y la nueva estructura -->
     <style>
         :root {
-            --theory-card-bg: #e8f8f5; /* Un color suave para las tarjetas de teoría */
+            --bg-color: #e0e0e0;
+            --primary-font-color: #3c3c3c;
+            --theory-card-bg: #e8f8f5;
             --theory-card-accent: #16a085;
         }
 
@@ -52,7 +54,6 @@
             font-weight: 500;
         }
 
-        /* Usamos Grid para un layout más robusto y alineado */
         .link-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -74,7 +75,6 @@
             pointer-events: none;
         }
         
-        /* Estilo especial para las tarjetas de teoría */
         .theory-card {
             background-color: var(--theory-card-bg);
             border-left: 5px solid var(--theory-card-accent);
@@ -99,13 +99,14 @@
     <main id="main-content">
         <header class="main-header">
             <h1>Ayudando a Fabiola</h1>
-            <p>Índice de Ejercicios y Teoría de Cinemática</p>
+            <p>Índice de Ejercicios y Teoría de Física</p>
         </header>
 
         <!-- Menú de Filtros Definitivo -->
         <nav class="filter-menu">
             <button class="filter-btn active" data-filter="todos">Mostrar Todos</button>
             <button class="filter-btn" data-filter="teoria">Teoría</button>
+            <button class="filter-btn" data-filter="vectores">Vectores</button>
             <button class="filter-btn" data-filter="movimiento-1d">Movimiento en 1D</button>
             <button class="filter-btn" data-filter="movimiento-y">Movimiento en Y</button>
             <button class="filter-btn" data-filter="relativo">Movimiento Relativo</button>
@@ -113,20 +114,29 @@
 
         <div class="link-container">
             <!-- TEORÍA -->
-            <a href="dteoria.html" class="link-card theory-card" data-category="teoria">
+            <a href="vteoria.html" class="link-card theory-card" data-category="teoria vectores">
+                <h2>Teoría: Vectores</h2>
+                <p>Fundamentos de vectores, suma, resta y productos escalar y vectorial.</p>
+            </a>
+            <a href="dteoria.html" class="link-card theory-card" data-category="teoria movimiento-1d">
                 <h2>Teoría: Cinemática en 1D</h2>
                 <p>Conceptos de posición, velocidad y aceleración en una dimensión.</p>
             </a>
-            <a href="gteoria.html" class="link-card theory-card" data-category="teoria">
+            <a href="gteoria.html" class="link-card theory-card" data-category="teoria movimiento-y">
                 <h2>Teoría: Movimiento Vertical</h2>
-                <p>Fórmulas y estrategias para problemas de caída libre y lanzamientos verticales.</p>
+                <p>Fórmulas y estrategias para problemas de caída libre y lanzamientos.</p>
             </a>
-            <a href="teoria.html" class="link-card theory-card" data-category="teoria">
+            <a href="teoria.html" class="link-card theory-card" data-category="teoria relativo">
                 <h2>Teoría: Movimiento Relativo</h2>
                 <p>La guía completa sobre cinemática vectorial y marcos de referencia.</p>
             </a>
 
-            <!-- EJERCICIOS DE MOVIMIENTO EN 1D -->
+            <!-- EJERCICIOS DE VECTORES -->
+            <a href="v1.html" class="link-card" data-category="vectores"><h2>V1: Suma Gráfica de Vectores</h2><p>Suma de dos desplazamientos (Este y Norte) por el método gráfico y analítico.</p></a>
+            <a href="v2.html" class="link-card" data-category="vectores"><h2>V2: Descomposición de un Vector</h2><p>Cálculo de las componentes X e Y de un desplazamiento noroeste.</p></a>
+            <a href="v3.html" class="link-card" data-category="vectores"><h2>V3: Suma de Vectores por Componentes</h2><p>Suma de dos vectores con ángulos complejos usando el método de componentes.</p></a>
+            <a href="v4.html" class="link-card" data-category="vectores"><h2>V4: Resta Gráfica y Analítica</h2><p>Cálculo del vector R = A - B, visualizando el concepto de vector opuesto.</p></a>
+   <!-- EJERCICIOS DE MOVIMIENTO EN 1D -->
             <a href="d1.html" class="link-card" data-category="movimiento-1d"><h2>D1: Análisis de Movimiento por Tramos</h2><p>Cálculo de velocidad media a partir de una tabla de datos de posición y tiempo.</p></a>
             <a href="d2.html" class="link-card" data-category="movimiento-1d"><h2>D2: Movimiento con Aceleración Constante</h2><p>Análisis de un móvil en tres fases: aceleración, velocidad constante y frenado.</p></a>
             <a href="d3.html" class="link-card" data-category="movimiento-1d"><h2>D3: Movimiento a partir de una Ecuación</h2><p>Cálculo de desplazamiento y velocidad promedio desde x(t) = -4t + 2t².</p></a>
@@ -147,13 +157,13 @@
             <a href="g5.html" class="link-card" data-category="movimiento-y"><h2>G5: Análisis de Alturas y Tiempos</h2><p>Cálculo de intervalos de tiempo y velocidades en una altura específica.</p></a>
 
             <!-- EJERCICIOS DE MOVIMIENTO RELATIVO Y VECTORIAL -->
-            <a href="1.html" class="link-card" data-category="relativo"><h2>R1: Corrigiendo el Rumbo</h2><p>Un piloto compensa el viento para volar hacia el Norte (trigonométrico).</p></a>
-            <a href="2.html" class="link-card" data-category="relativo"><h2>R2: Misión en el Río</h2><p>Un bote cruza un río con corriente para llegar a un punto específico.</p></a>
-            <a href="3.html" class="link-card" data-category="relativo"><h2>R3: Cinemática del Velero</h2><p>Cálculo de velocidad media e instantánea a partir de ecuaciones de posición.</p></a>
-            <a href="4.html" class="link-card" data-category="relativo"><h2>R4: Rumbo del Avión (Clásico)</h2><p>Un avión compensa un viento lateral para mantener un rumbo Norte.</p></a>
-            <a href="5.html" class="link-card" data-category="relativo"><h2>R5: Cinemática de un Proyectil</h2><p>Cálculo de velocidad y aceleración a partir de la ecuación de posición.</p></a>
-            <a href="6.html" class="link-card" data-category="relativo"><h2>R6: Aceleración en una Curva</h2><p>Cálculo de la aceleración media de un coche que cambia de dirección.</p></a>
-            <a href="7.html" class="link-card" data-category="relativo"><h2>R7: Movimiento Relativo Complejo</h2><p>Problema avanzado con tres cuerpos: portaaviones, avión y helicóptero.</p></a>
+            <a href="r1.html" class="link-card" data-category="relativo"><h2>R1: Corrigiendo el Rumbo</h2><p>Un piloto compensa el viento para volar hacia el Norte (trigonométrico).</p></a>
+            <a href="r2.html" class="link-card" data-category="relativo"><h2>R2: Misión en el Río</h2><p>Un bote cruza un río con corriente para llegar a un punto específico.</p></a>
+            <a href="r3.html" class="link-card" data-category="relativo"><h2>R3: Cinemática del Velero</h2><p>Cálculo de velocidad media e instantánea a partir de ecuaciones de posición.</p></a>
+            <a href="r4.html" class="link-card" data-category="relativo"><h2>R4: Rumbo del Avión (Clásico)</h2><p>Un avión compensa un viento lateral para mantener un rumbo Norte.</p></a>
+            <a href="r5.html" class="link-card" data-category="relativo"><h2>R5: Cinemática de un Proyectil</h2><p>Cálculo de velocidad y aceleración a partir de la ecuación de posición.</p></a>
+            <a href="r6.html" class="link-card" data-category="relativo"><h2>R6: Aceleración en una Curva</h2><p>Cálculo de la aceleración media de un coche que cambia de dirección.</p></a>
+            <a href="r7.html" class="link-card" data-category="relativo"><h2>R7: Movimiento Relativo Complejo</h2><p>Problema avanzado con tres cuerpos: portaaviones, avión y helicóptero.</p></a>
         </div>
     </main>
 
@@ -182,15 +192,15 @@
                     const filter = button.dataset.filter;
 
                     cards.forEach(card => {
-                        const category = card.dataset.category;
-                        const shouldShow = filter === 'todos' || category === filter;
+                        // Modificación para permitir múltiples categorías
+                        const categories = card.dataset.category.split(' ');
+                        const shouldShow = filter === 'todos' || categories.includes(filter);
                         
                         if (shouldShow) {
                             card.classList.remove('hidden');
-                            card.style.display = ''; // Restablece a su display por defecto (grid lo manejará)
+                            card.style.display = '';
                         } else {
                             card.classList.add('hidden');
-                            // Ocultar del layout después de la animación de salida
                             setTimeout(() => {
                                 if (card.classList.contains('hidden')) {
                                     card.style.display = 'none';
