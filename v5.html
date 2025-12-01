@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio: Componentes de un Vector</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                macros: {
+                    vec: ['\\vec{#1}', 1],
+                    i: '\\hat{i}',
+                    j: '\\hat{j}'
+                }
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { 
+            --bg-color: #e0e0e0; 
+            --primary-font-color: #3c3c3c; 
+            --accent-color: #34495e; /* Azul oscuro */
+            --accent-color-dark: #2c3e50;
+            --vector-a-color: #9b59b6; /* Morado */
+            --vector-r-color: #1abc9c; /* Turquesa */
+            --vector-b-color: #e67e22; /* Naranja */
+            --card-padding: 1.5rem; 
+            --card-border-radius: 1.25rem; 
+            --font-title: 'Anton', sans-serif; 
+            --font-body: 'Oswald', sans-serif; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #grafica-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #ecf0f1; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #ecf0f1; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Encontrar un Vector Desconocido</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Se tienen dos vectores en el plano cartesiano (xy):</p>
+            <ul>
+                <li>Vector $\vec{A} = (5\i + 8\j)$</li>
+                <li>Vector $\vec{B}$ con componentes desconocidas $(B_x, B_y)$.</li>
+            </ul>
+            <p>El vector resultante de la resta $\vec{R} = \vec{A} - \vec{B}$ es igual a $\vec{R} = (2\i + 11\j)$.</p>
+            <p><strong>Determine las componentes del vector $\vec{B}$ ($B_x$ y $B_y$).</strong></p>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Visualización de la Solución</h2>
+            <div id="anim-description">Presiona "Siguiente" para construir el diagrama.</div>
+            <svg id="grafica-svg" viewBox="-50 -50 350 350"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>1. Reorganizar la Ecuación Vectorial</h3>
+            <p>Partimos de la ecuación dada: $\vec{R} = \vec{A} - \vec{B}$. Nuestro objetivo es encontrar $\vec{B}$, por lo que debemos despejarlo algebraicamente.</p>
+            <div class="formula-box">
+                $\vec{R} = \vec{A} - \vec{B}$<br>
+                $\vec{R} + \vec{B} = \vec{A}$<br>
+                $\vec{B} = \vec{A} - \vec{R}$
+            </div>
+            <p>Esto nos dice que para encontrar el vector $\vec{B}$, debemos restar el vector $\vec{R}$ del vector $\vec{A}$.</p>
+
+            <h3>2. Restar Componente a Componente</h3>
+            <p>Ahora aplicamos la resta de vectores usando sus componentes. La componente $x$ de $\vec{B}$ es la resta de las componentes $x$ de $\vec{A}$ y $\vec{R}$, y lo mismo para la componente $y$.</p>
+            <div class="formula-box">
+                <strong>Componente x:</strong> $B_x = A_x - R_x = 5 - 2 = 3$<br><br>
+                <strong>Componente y:</strong> $B_y = A_y - R_y = 8 - 11 = -3$
+            </div>
+            
+            <h3>3. Escribir el Vector Resultante</h3>
+            <p>Con las componentes calculadas, podemos escribir el vector $\vec{B}$ completo.</p>
+            <div class="formula-box">
+                $\vec{B} = (3\i - 3\j)$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuesta Final</h2>
+            <p class="respuesta-item">
+                Las componentes del vector $\vec{B}$ son:<br>
+                $B_x = 3$<br>
+                $B_y = -3$
+            </p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('grafica-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const PIXELS_PER_UNIT = 20;
+        const ORIGIN = { x: 100, y: 150 };
+
+        // Componentes
+        const A = { x: 5, y: 8 };
+        const R = { x: 2, y: 11 };
+        const B = { x: A.x - R.x, y: A.y - R.y }; // B = {3, -3}
+
+        // Puntos en SVG (Y invertido)
+        const endA = { x: ORIGIN.x + A.x * PIXELS_PER_UNIT, y: ORIGIN.y - A.y * PIXELS_PER_UNIT };
+        const endR = { x: ORIGIN.x + R.x * PIXELS_PER_UNIT, y: ORIGIN.y - R.y * PIXELS_PER_UNIT };
+        const endB = { x: ORIGIN.x + B.x * PIXELS_PER_UNIT, y: ORIGIN.y - B.y * PIXELS_PER_UNIT };
+        
+        // Vector -R desde la punta de A
+        const endNegR_fromA = {
+            x: endA.x - R.x * PIXELS_PER_UNIT,
+            y: endA.y + R.y * PIXELS_PER_UNIT
+        };
+
+        let svgContent = `
+            <defs>
+                <marker id="arrowhead" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" /></marker>
+            </defs>
+            
+            <g id="axes" visibility="hidden">
+                <line x1="0" y1="${ORIGIN.y}" x2="300" y2="${ORIGIN.y}" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <line x1="${ORIGIN.x}" y1="300" x2="${ORIGIN.x}" y2="-20" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <text x="305" y="${ORIGIN.y + 5}" font-size="14" font-family="Oswald">x</text>
+                <text x="${ORIGIN.x + 5}" y="-25" font-size="14" font-family="Oswald">y</text>
+            </g>
+
+            <g id="vector-a" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${endA.x}" y2="${endA.y}" stroke="var(--vector-a-color)" stroke-width="3" marker-end="url(#arrowhead)" />
+                <text x="${endA.x + 5}" y="${endA.y}" fill="var(--vector-a-color)" font-weight="bold">A</text>
+            </g>
+
+            <g id="vector-r" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${endR.x}" y2="${endR.y}" stroke="var(--vector-r-color)" stroke-width="3" marker-end="url(#arrowhead)" opacity="0.6"/>
+                <text x="${endR.x - 20}" y="${endR.y - 10}" fill="var(--vector-r-color)" font-weight="bold" opacity="0.7">R</text>
+            </g>
+
+            <g id="vector-neg-r" visibility="hidden">
+                <line x1="${endA.x}" y1="${endA.y}" x2="${endB.x}" y2="${endB.y}" stroke="var(--vector-r-color)" stroke-width="2" stroke-dasharray="5" marker-end="url(#arrowhead)" />
+                <text x="${(endA.x + endB.x)/2}" y="${(endA.y + endB.y)/2 + 20}" fill="var(--vector-r-color)" font-weight="bold">-R</text>
+            </g>
+
+            <g id="vector-b" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${endB.x}" y2="${endB.y}" stroke="var(--vector-b-color)" stroke-width="4" marker-end="url(#arrowhead)" />
+                <text x="${endB.x + 10}" y="${endB.y}" fill="var(--vector-b-color)" font-weight="bold" font-size="16">B = A - R</text>
+            </g>
+        `;
+        svg.innerHTML = svgContent;
+
+        const elements = {
+            axes: document.getElementById('axes'),
+            vectorA: document.getElementById('vector-a'),
+            vectorR: document.getElementById('vector-r'),
+            vectorNegR: document.getElementById('vector-neg-r'),
+            vectorB: document.getElementById('vector-b')
+        };
+
+        const animationSteps = [
+            { desc: "Presiona 'Siguiente' para empezar.", visible: [] },
+            { desc: "<strong>Paso 1:</strong> Dibujamos los ejes y los vectores conocidos: $\\vec{A}$ y $\\vec{R}$.", visible: ['axes', 'vectorA', 'vectorR'] },
+            { desc: "<strong>Paso 2:</strong> La ecuación es $\\vec{R} = \\vec{A} - \\vec{B}$. La reorganizamos para encontrar $\\vec{B}$: $\\vec{B} = \\vec{A} - \\vec{R}$.", visible: ['axes', 'vectorA', 'vectorR'] },
+            { desc: "<strong>Paso 3:</strong> Para calcular $\\vec{A} - \\vec{R}$ gráficamente, sumamos el opuesto de $\\vec{R}$. Dibujamos $-\\vec{R}$ desde la punta de $\\vec{A}$.", visible: ['axes', 'vectorA', 'vectorNegR'] },
+            { desc: "<strong>Paso 4:</strong> El vector resultante de esta operación, que va desde el origen hasta la punta de $-\\vec{R}$, es nuestro vector desconocido $\\vec{B}$.", visible: ['axes', 'vectorA', 'vectorNegR', 'vectorB'] },
+            { desc: "<strong>Paso 5:</strong> El diagrama está completo. Las componentes de $\\vec{B}$ son (3, -3).", visible: ['axes', 'vectorA', 'vectorNegR', 'vectorB'] }
+        ];
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+            descriptionBox.innerHTML = step.desc;
+
+            for (const key in elements) {
+                elements[key].setAttribute('visibility', step.visible.includes(key) ? 'visible' : 'hidden');
+            }
+            if (step.desc.includes('$')) {
+                MathJax.typesetPromise([descriptionBox]);
+            }
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        document.addEventListener('MathJaxReady', () => {
+            MathJax.typesetPromise();
+        });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

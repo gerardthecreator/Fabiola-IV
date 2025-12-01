@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría de Vectores: Conceptos y Fórmulas</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { 
+            --bg-color: #e0e0e0; 
+            --primary-font-color: #3c3c3c; 
+            --accent-color: #3498db; /* Azul profesional */
+            --accent-color-dark: #2980b9;
+            --card-padding: 1.5rem; 
+            --card-border-radius: 1.25rem; 
+            --font-title: 'Anton', sans-serif; 
+            --font-body: 'Oswald', sans-serif; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.8rem; text-transform: uppercase; }
+        h2 { font-size: 2rem; color: var(--accent-color); text-align: left; border-bottom: 2px solid var(--accent-color-dark); padding-bottom: 0.5rem; margin-top: 2.5rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--primary-font-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        .formula-box { background: #ecf0f1; padding: 1.5rem; margin-top: 1rem; border-radius: 1rem; border-left: 5px solid var(--accent-color); text-align: center; overflow-x: auto; box-shadow: inset 3px 3px 7px #d5d9da, inset -3px -3px 7px #ffffff; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { border: 1px solid #bdc3c7; padding: 0.8rem; text-align: left; font-weight: 300; }
+        th { background-color: var(--accent-color-dark); color: white; font-family: var(--font-title); letter-spacing: 1px; font-weight: 400; }
+        tr:nth-child(even) { background-color: #ecf0f1; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Guía Completa de Vectores</h1>
+        
+        <section class="card">
+            <h2>1. ¿Qué es un Vector?</h2>
+            <p>En física y matemáticas, un <strong>vector</strong> es una entidad que tiene tanto <strong>magnitud</strong> (o módulo) como <strong>dirección</strong>. Se diferencia de un escalar, que solo tiene magnitud (como la temperatura o la masa).</p>
+            <p>Ejemplos de vectores incluyen el desplazamiento, la velocidad, la aceleración y la fuerza.</p>
+            
+            <h3>Representación Gráfica</h3>
+            <p>Un vector se representa gráficamente como una flecha. La <strong>longitud</strong> de la flecha representa su magnitud, y la <strong>punta</strong> de la flecha indica su dirección.</p>
+
+            <h3>Representación Analítica (Componentes)</h3>
+            <p>En un sistema de coordenadas (como el cartesiano x-y), un vector puede descomponerse en sus <strong>componentes</strong>. Estas son las "sombras" o proyecciones del vector sobre cada eje.</p>
+            <p>Para un vector $\vec{V}$ y un ángulo $\theta$ medido desde el eje x positivo:</p>
+            <div class="formula-box">
+                Componente x: $V_x = |\vec{V}| \cos(\theta)$<br>
+                Componente y: $V_y = |\vec{V}| \sin(\theta)$
+            </div>
+            <p>Inversamente, si conoces las componentes, puedes encontrar la magnitud y la dirección:</p>
+            <div class="formula-box">
+                Magnitud: $|\vec{V}| = \sqrt{V_x^2 + V_y^2}$ (Teorema de Pitágoras)<br>
+                Dirección: $\theta = \arctan\left(\frac{V_y}{V_x}\right)$
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>2. Operaciones con Vectores</h2>
+
+            <h3>Suma de Vectores: $\vec{R} = \vec{A} + \vec{B}$</h3>
+            <p><strong>Método Gráfico (Cabeza con Cola):</strong> Se dibuja el primer vector $\vec{A}$. Luego, se dibuja el segundo vector $\vec{B}$ comenzando desde la punta (cabeza) de $\vec{A}$. El vector resultante $\vec{R}$ es la flecha que va desde el origen de $\vec{A}$ hasta la punta de $\vec{B}$.</p>
+            <p><strong>Método Analítico (por Componentes):</strong> Es el método más preciso. Se suman las componentes correspondientes de cada vector.</p>
+            <div class="formula-box">
+                $R_x = A_x + B_x$<br>
+                $R_y = A_y + B_y$
+            </div>
+            <p>Luego, se calcula la magnitud y dirección de $\vec{R}$ usando sus componentes $R_x$ y $R_y$.</p>
+
+            <h3>Resta de Vectores: $\vec{R} = \vec{A} - \vec{B}$</h3>
+            <p>Restar un vector es lo mismo que sumar su opuesto. El vector opuesto ($-\vec{B}$) tiene la misma magnitud que $\vec{B}$ pero apunta en la dirección contraria (180° de diferencia).</p>
+            <div class="formula-box">
+                $\vec{R} = \vec{A} + (-\vec{B})$
+            </div>
+            <p><strong>Método Analítico:</strong> Se restan las componentes correspondientes.</p>
+            <div class="formula-box">
+                $R_x = A_x - B_x$<br>
+                $R_y = A_y - B_y$
+            </div>
+
+            <h3>Producto Escalar (Producto Punto): $c = \vec{A} \cdot \vec{B}$</h3>
+            <p>El producto escalar de dos vectores da como resultado un <strong>escalar</strong> (un número, no un vector). Mide qué tan alineados están dos vectores. Una aplicación clave es el cálculo del <strong>Trabajo</strong> ($W = \vec{F} \cdot \vec{d}$).</p>
+            <p><strong>Fórmula Geométrica (con el ángulo):</strong></p>
+            <div class="formula-box">
+                $\vec{A} \cdot \vec{B} = |\vec{A}| |\vec{B}| \cos(\theta)$<br>
+                <small>($\theta$ es el ángulo <strong>entre</strong> los dos vectores)</small>
+            </div>
+            <p><strong>Fórmula Analítica (con componentes):</strong></p>
+            <div class="formula-box">
+                $\vec{A} \cdot \vec{B} = A_x B_x + A_y B_y$
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>3. Tabla Resumen de Fórmulas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Fórmula</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Componente X</td>
+                        <td>$V_x = |\vec{V}| \cos(\theta)$</td>
+                        <td>Proyección del vector sobre el eje x.</td>
+                    </tr>
+                    <tr>
+                        <td>Componente Y</td>
+                        <td>$V_y = |\vec{V}| \sin(\theta)$</td>
+                        <td>Proyección del vector sobre el eje y.</td>
+                    </tr>
+                    <tr>
+                        <td>Magnitud desde Componentes</td>
+                        <td>$|\vec{V}| = \sqrt{V_x^2 + V_y^2}$</td>
+                        <td>Longitud del vector.</td>
+                    </tr>
+                    <tr>
+                        <td>Dirección desde Componentes</td>
+                        <td>$\theta = \arctan\left(\frac{V_y}{V_x}\right)$</td>
+                        <td>Ángulo del vector con el eje x.</td>
+                    </tr>
+                    <tr>
+                        <td>Suma (Componentes)</td>
+                        <td>$R_x = A_x + B_x, R_y = A_y + B_y$</td>
+                        <td>Se suman las componentes por separado.</td>
+                    </tr>
+                    <tr>
+                        <td>Resta (Componentes)</td>
+                        <td>$R_x = A_x - B_x, R_y = A_y - B_y$</td>
+                        <td>Se restan las componentes por separado.</td>
+                    </tr>
+                    <tr>
+                        <td>Producto Escalar (Geométrico)</td>
+                        <td>$c = |\vec{A}| |\vec{B}| \cos(\theta)$</td>
+                        <td>Usa magnitudes y el ángulo entre vectores.</td>
+                    </tr>
+                    <tr>
+                        <td>Producto Escalar (Analítico)</td>
+                        <td>$c = A_x B_x + A_y B_y$</td>
+                        <td>Usa las componentes de los vectores.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+</body>
+</html>

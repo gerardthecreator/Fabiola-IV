@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio: Suma Gráfica de Vectores</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+                // --- CORRECCIÓN CLAVE: Se eliminó el bloque 'macros' recursivo ---
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { --bg-color: #e0e0e0; --primary-font-color: #3c3c3c; --accent-color: #16a085; --accent-color-dark: #117a65; --vector-a-color: #c0392b; --vector-b-color: #2980b9; --vector-c-color: #8e44ad; --card-padding: 1.5rem; --card-border-radius: 1.25rem; --font-title: 'Anton', sans-serif; --font-body: 'Oswald', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #grafica-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #e8f6f3; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #e8f6f3; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Suma Gráfica de Vectores</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <!-- CORREGIDO: Se usa una sola barra '\' -->
+            <p>Sean $\vec{A}$ y $\vec{B}$ los desplazamientos de <strong>3.00 km hacia el Este</strong> y <strong>4.00 km hacia el Norte</strong>, respectivamente. Sea $\vec{C} = \vec{A} + \vec{B}$.</p>
+            <p>Usando el método gráfico (cabeza con cola) y una escala de 1 cm = 1 km, determine el módulo y la dirección del vector resultante $\vec{C}$.</p>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Construcción Gráfica</h2>
+            <div id="anim-description">Presiona "Siguiente" para construir el diagrama.</div>
+            <svg id="grafica-svg" viewBox="0 0 300 300"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada</h2>
+            <h3>1. Interpretación Gráfica (Método del Dibujo)</h3>
+            <p>Siguiendo las instrucciones, dibujamos los vectores a escala. El vector $\vec{A}$ se dibuja de 3 cm hacia el Este. Desde la punta de $\vec{A}$, se dibuja el vector $\vec{B}$ de 4 cm hacia el Norte. El vector resultante $\vec{C}$ va desde el origen de $\vec{A}$ hasta la punta de $\vec{B}$.</p>
+            <div class="formula-box">
+                <strong>Módulo de C:</strong> Al medir la longitud del vector $\vec{C}$ en el dibujo con una regla, obtendríamos <strong>5.00 cm</strong>. Usando la escala, esto equivale a <strong>5.00 km</strong>.<br><br>
+                <strong>Dirección de C:</strong> Al usar un transportador para medir el ángulo $\theta$ que forma $\vec{C}$ con el eje Este (vector $\vec{A}$), obtendríamos aproximadamente <strong>53°</strong>.
+            </div>
+
+            <h3>2. Verificación Analítica (Cálculo)</h3>
+            <p>Podemos confirmar los resultados del método gráfico usando el Teorema de Pitágoras para el módulo y trigonometría para la dirección, ya que los vectores forman un triángulo rectángulo.</p>
+            <div class="formula-box">
+                <strong>Módulo de C:</strong> $|\vec{C}| = \sqrt{|\vec{A}|^2 + |\vec{B}|^2} = \sqrt{(3.00)^2 + (4.00)^2} = \sqrt{9.00 + 16.0} = \sqrt{25.0} = 5.00 \text{ km}$<br><br>
+                <strong>Dirección de C:</strong> $\theta = \arctan\left(\frac{|\vec{B}|}{|\vec{A}|}\right) = \arctan\left(\frac{4.00}{3.00}\right) \approx 53.1^\circ$
+            </div>
+            <p>Los cálculos confirman que el método gráfico es una forma visualmente precisa de sumar vectores.</p>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuesta Final</h2>
+            <p class="respuesta-item">El vector resultante $\vec{C}$ tiene un módulo de <strong>5.00 km</strong> y una dirección de <strong>53.1° al Norte del Este</strong>.</p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('grafica-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const PIXELS_PER_KM = 50;
+        const ORIGIN = { x: 50, y: 250 };
+
+        const A = { x: 3 * PIXELS_PER_KM, y: 0 };
+        const B = { x: 0, y: -4 * PIXELS_PER_KM }; // -Y es hacia arriba en SVG
+
+        let svgContent = `
+            <defs>
+                <marker id="arrowhead" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+                    <polygon points="0 0, 7 2.5, 0 5" />
+                </marker>
+            </defs>
+            
+            <g id="axes" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${ORIGIN.x + 50}" y2="${ORIGIN.y}" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${ORIGIN.x}" y2="${ORIGIN.y - 50}" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <text x="${ORIGIN.x + 60}" y="${ORIGIN.y + 5}" font-size="14" font-family="Oswald">E</text>
+                <text x="${ORIGIN.x - 15}" y="${ORIGIN.y - 50}" font-size="14" font-family="Oswald">N</text>
+            </g>
+
+            <g id="scale" visibility="hidden">
+                <rect x="20" y="20" width="${PIXELS_PER_KM}" height="5" fill="black" />
+                <text x="20" y="40" font-size="12" font-family="Oswald">1 km (escala)</text>
+            </g>
+
+            <g id="vector-a" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${ORIGIN.x + A.x}" y2="${ORIGIN.y}" stroke="var(--vector-a-color)" stroke-width="3" marker-end="url(#arrowhead)" />
+                <text x="${ORIGIN.x + A.x / 2}" y="${ORIGIN.y + 20}" fill="var(--vector-a-color)" font-weight="bold">A (3 km)</text>
+            </g>
+
+            <g id="vector-b" visibility="hidden">
+                <line x1="${ORIGIN.x + A.x}" y1="${ORIGIN.y}" x2="${ORIGIN.x + A.x}" y2="${ORIGIN.y + B.y}" stroke="var(--vector-b-color)" stroke-width="3" marker-end="url(#arrowhead)" />
+                <text x="${ORIGIN.x + A.x + 10}" y="${ORIGIN.y + B.y / 2}" fill="var(--vector-b-color)" font-weight="bold">B (4 km)</text>
+            </g>
+
+            <g id="vector-c" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${ORIGIN.x + A.x}" y2="${ORIGIN.y + B.y}" stroke="var(--vector-c-color)" stroke-width="4" marker-end="url(#arrowhead)" />
+                <text x="${ORIGIN.x + A.x / 2 - 20}" y="${ORIGIN.y + B.y / 2 - 10}" fill="var(--vector-c-color)" font-weight="bold" font-size="16">C (5 km)</text>
+            </g>
+
+            <g id="angle" visibility="hidden">
+                <path d="M ${ORIGIN.x + 30} ${ORIGIN.y} A 30 30 0 0 1 ${ORIGIN.x + 30 * Math.cos(53.1 * Math.PI / 180)} ${ORIGIN.y - 30 * Math.sin(53.1 * Math.PI / 180)}" stroke="black" stroke-width="1.5" fill="none" />
+                <text x="${ORIGIN.x + 40}" y="${ORIGIN.y - 20}" font-size="14" font-weight="bold">θ</text>
+            </g>
+        `;
+        svg.innerHTML = svgContent;
+
+        const elements = {
+            axes: document.getElementById('axes'),
+            scale: document.getElementById('scale'),
+            vectorA: document.getElementById('vector-a'),
+            vectorB: document.getElementById('vector-b'),
+            vectorC: document.getElementById('vector-c'),
+            angle: document.getElementById('angle')
+        };
+
+        const animationSteps = [
+            { desc: "Presiona 'Siguiente' para empezar.", visible: [] },
+            { desc: "<strong>Paso 1:</strong> Dibujamos los ejes Norte y Este, y la escala.", visible: ['axes', 'scale'] },
+            { desc: "<strong>Paso 2:</strong> Dibujamos el vector A (3 km al Este) desde el origen.", visible: ['axes', 'scale', 'vectorA'] },
+            { desc: "<strong>Paso 3:</strong> Desde la punta de A, dibujamos el vector B (4 km al Norte).", visible: ['axes', 'scale', 'vectorA', 'vectorB'] },
+            { desc: "<strong>Paso 4:</strong> El vector resultante C va desde el origen de A hasta la punta de B.", visible: ['axes', 'scale', 'vectorA', 'vectorB', 'vectorC'] },
+            { desc: "<strong>Paso 5:</strong> Medimos el ángulo θ que forma C con el Este. Resultado: 53.1°", visible: ['axes', 'scale', 'vectorA', 'vectorB', 'vectorC', 'angle'] }
+        ];
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+            descriptionBox.innerHTML = step.desc;
+
+            for (const key in elements) {
+                elements[key].setAttribute('visibility', step.visible.includes(key) ? 'visible' : 'hidden');
+            }
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        document.addEventListener('MathJaxReady', () => {
+            MathJax.typesetPromise();
+        });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

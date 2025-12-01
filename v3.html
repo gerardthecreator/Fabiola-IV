@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio: Suma Gráfica de Vectores Múltiples</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { 
+            --bg-color: #e0e0e0; 
+            --primary-font-color: #3c3c3c; 
+            --accent-color: #8e44ad; /* Morado */
+            --accent-color-dark: #7d3c98;
+            --vector-a-color: #27ae60; /* Verde */
+            --vector-b-color: #2980b9; /* Azul */
+            --vector-c-color: #d35400; /* Naranja oscuro */
+            --card-padding: 1.5rem; 
+            --card-border-radius: 1.25rem; 
+            --font-title: 'Anton', sans-serif; 
+            --font-body: 'Oswald', sans-serif; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #grafica-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #f4ecf7; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #f4ecf7; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Suma Gráfica de Vectores</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Se suman dos vectores $\vec{A}$ y $\vec{B}$ para obtener un vector resultante $\vec{C} = \vec{A} + \vec{B}$.</p>
+            <ul>
+                <li>El vector $\vec{A}$ tiene una magnitud de <strong>3.00 unidades</strong> y forma un ángulo de <strong>60° con el eje x positivo</strong> (nordeste).</li>
+                <li>El vector $\vec{B}$ tiene una magnitud de <strong>4.00 unidades</strong> y forma un ángulo de <strong>40° con la dirección oeste</strong> (hacia el norte del oeste).</li>
+            </ul>
+            <p>Usando el método gráfico y verificando con el método analítico, determine la magnitud de $\vec{C}$ y el ángulo que forma con la dirección oeste (eje -x).</p>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Construcción Gráfica</h2>
+            <div id="anim-description">Presiona "Siguiente" para construir el diagrama.</div>
+            <svg id="grafica-svg" viewBox="-200 -300 400 400"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada (Método Analítico)</h2>
+            <h3>1. Descomposición de Vectores</h3>
+            <p>Primero, descomponemos cada vector en sus componentes $x$ e $y$. Para ello, necesitamos sus ángulos estándar (medidos desde el eje +x en sentido antihorario).</p>
+            <ul>
+                <li><strong>Vector A:</strong> El ángulo ya es estándar. $\theta_A = 60^\circ$.</li>
+                <li><strong>Vector B:</strong> "40° con la dirección oeste" hacia el norte significa 40° desde el eje -x hacia el eje +y. El ángulo estándar es $\theta_B = 180^\circ - 40^\circ = 140^\circ$.</li>
+            </ul>
+            <div class="formula-box">
+                $A_x = |\vec{A}| \cos(\theta_A) = 3.00 \cdot \cos(60^\circ) = 1.50$<br>
+                $A_y = |\vec{A}| \sin(\theta_A) = 3.00 \cdot \sin(60^\circ) = 2.60$<br><br>
+                $B_x = |\vec{B}| \cos(\theta_B) = 4.00 \cdot \cos(140^\circ) = -3.06$<br>
+                $B_y = |\vec{B}| \sin(\theta_B) = 4.00 \cdot \sin(140^\circ) = 2.57$
+            </div>
+
+            <h3>2. Suma de Componentes</h3>
+            <p>Sumamos las componentes para encontrar las del vector resultante $\vec{C}$.</p>
+            <div class="formula-box">
+                $C_x = A_x + B_x = 1.50 + (-3.06) = -1.56$<br>
+                $C_y = A_y + B_y = 2.60 + 2.57 = 5.17$
+            </div>
+
+            <h3>3. Magnitud y Dirección de $\vec{C}$</h3>
+            <p>Usamos el Teorema de Pitágoras para la magnitud y la arcotangente para la dirección.</p>
+            <div class="formula-box">
+                <strong>Magnitud:</strong> $|\vec{C}| = \sqrt{C_x^2 + C_y^2} = \sqrt{(-1.56)^2 + (5.17)^2} = \sqrt{2.43 + 26.73} \approx 5.40 \text{ unidades}$<br><br>
+                <strong>Ángulo estándar:</strong> $\theta_C = \arctan\left(\frac{C_y}{C_x}\right) = \arctan\left(\frac{5.17}{-1.56}\right) \approx 106.8^\circ$
+            </div>
+            <p>El ángulo de $106.8^\circ$ es el medido desde el eje Este (+x). El problema pide el ángulo con el eje Oeste (-x). Como el vector está en el segundo cuadrante, este ángulo ($\alpha$) es:</p>
+            <div class="formula-box">
+                $\alpha = 180^\circ - \theta_C = 180^\circ - 106.8^\circ = 73.2^\circ$
+            </div>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuesta Final</h2>
+            <p class="respuesta-item">
+                El vector resultante $\vec{C}$ tiene una magnitud de <strong>5.40 unidades</strong> y forma un ángulo de <strong>73.2° con la dirección Oeste</strong> (hacia el Norte).
+            </p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('grafica-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const PIXELS_PER_UNIT = 40;
+        const ORIGIN = { x: 50, y: 100 };
+
+        // Vector A
+        const magA = 3 * PIXELS_PER_UNIT;
+        const angleA_rad = 60 * Math.PI / 180;
+        const endA = {
+            x: ORIGIN.x + magA * Math.cos(angleA_rad),
+            y: ORIGIN.y - magA * Math.sin(angleA_rad) // SVG Y-axis is inverted
+        };
+
+        // Vector B
+        const magB = 4 * PIXELS_PER_UNIT;
+        const angleB_rad = 140 * Math.PI / 180; // 180 - 40
+        const endB = {
+            x: endA.x + magB * Math.cos(angleB_rad),
+            y: endA.y - magB * Math.sin(angleB_rad)
+        };
+        
+        // Vector C
+        const angleC_rad = Math.atan2(endB.y - ORIGIN.y, endB.x - ORIGIN.x);
+
+        let svgContent = `
+            <defs>
+                <marker id="arrowhead" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" /></marker>
+            </defs>
+            
+            <g id="axes" visibility="hidden">
+                <line x1="-180" y1="${ORIGIN.y}" x2="200" y2="${ORIGIN.y}" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <line x1="${ORIGIN.x}" y1="150" x2="${ORIGIN.x}" y2="-280" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <text x="205" y="${ORIGIN.y + 5}" font-size="14" font-family="Oswald">E (x+)</text>
+                <text x="${ORIGIN.x + 5}" y="-285" font-size="14" font-family="Oswald">N (y+)</text>
+            </g>
+
+            <g id="vector-a" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${endA.x}" y2="${endA.y}" stroke="var(--vector-a-color)" stroke-width="3" marker-end="url(#arrowhead)" />
+                <text x="${(ORIGIN.x + endA.x)/2 + 10}" y="${(ORIGIN.y + endA.y)/2}" fill="var(--vector-a-color)" font-weight="bold">A</text>
+                <path d="M ${ORIGIN.x + 30} ${ORIGIN.y} A 30 30 0 0 1 ${ORIGIN.x + 30 * Math.cos(angleA_rad)} ${ORIGIN.y - 30 * Math.sin(angleA_rad)}" stroke="black" stroke-width="1" fill="none" />
+                <text x="${ORIGIN.x + 40}" y="${ORIGIN.y - 20}" font-size="12">60°</text>
+            </g>
+
+            <g id="vector-b" visibility="hidden">
+                <line x1="${endA.x - 100}" y1="${endA.y}" x2="${endA.x + 50}" y2="${endA.y}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3" />
+                <text x="${endA.x - 115}" y="${endA.y + 5}" font-size="12" fill="#7f8c8d">Oeste</text>
+                <line x1="${endA.x}" y1="${endA.y}" x2="${endB.x}" y2="${endB.y}" stroke="var(--vector-b-color)" stroke-width="3" marker-end="url(#arrowhead)" />
+                <text x="${(endA.x + endB.x)/2 - 20}" y="${(endA.y + endB.y)/2}" fill="var(--vector-b-color)" font-weight="bold">B</text>
+                <path d="M ${endA.x - 30} ${endA.y} A 30 30 0 0 1 ${endA.x + 30 * Math.cos(140 * Math.PI/180)} ${endA.y - 30 * Math.sin(140 * Math.PI/180)}" stroke="black" stroke-width="1" fill="none" />
+                <text x="${endA.x - 50}" y="${endA.y - 20}" font-size="12">40°</text>
+            </g>
+
+            <g id="vector-c" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${endB.x}" y2="${endB.y}" stroke="var(--vector-c-color)" stroke-width="4" marker-end="url(#arrowhead)" />
+                <text x="${(ORIGIN.x + endB.x)/2 - 30}" y="${(ORIGIN.y + endB.y)/2 - 10}" fill="var(--vector-c-color)" font-weight="bold" font-size="16">C</text>
+            </g>
+
+            <g id="angle-c" visibility="hidden">
+                <line x1="${ORIGIN.x - 150}" y1="${ORIGIN.y}" x2="${ORIGIN.x}" y2="${ORIGIN.y}" stroke="#7f8c8d" stroke-width="1.5" />
+                <path d="M ${ORIGIN.x - 40} ${ORIGIN.y} A 40 40 0 0 1 ${ORIGIN.x + 40 * Math.cos(angleC_rad)}" y="${ORIGIN.y + 40 * Math.sin(angleC_rad)}" stroke="var(--accent-color-dark)" stroke-width="1.5" fill="none" />
+                <text x="${ORIGIN.x - 70}" y="${ORIGIN.y - 40}" font-size="14" font-weight="bold" fill="var(--accent-color-dark)">α=73.2°</text>
+            </g>
+        `;
+        svg.innerHTML = svgContent;
+
+        const elements = {
+            axes: document.getElementById('axes'),
+            vectorA: document.getElementById('vector-a'),
+            vectorB: document.getElementById('vector-b'),
+            vectorC: document.getElementById('vector-c'),
+            angleC: document.getElementById('angle-c')
+        };
+
+        const animationSteps = [
+            { desc: "Presiona 'Siguiente' para empezar.", visible: [] },
+            { desc: "<strong>Paso 1:</strong> Dibujamos los ejes cardinales Este (x+) y Norte (y+).", visible: ['axes'] },
+            { desc: "<strong>Paso 2:</strong> Dibujamos el vector $\\vec{A}$ (3 unidades a 60°).", visible: ['axes', 'vectorA'] },
+            { desc: "<strong>Paso 3:</strong> Desde la punta de $\\vec{A}$, dibujamos el vector $\\vec{B}$ (4 unidades a 40° del Oeste).", visible: ['axes', 'vectorA', 'vectorB'] },
+            { desc: "<strong>Paso 4:</strong> El vector resultante $\\vec{C}$ une el origen de $\\vec{A}$ con la punta de $\\vec{B}$.", visible: ['axes', 'vectorA', 'vectorB', 'vectorC'] },
+            { desc: "<strong>Paso 5:</strong> Medimos el ángulo $\\alpha$ que forma $\\vec{C}$ con el eje Oeste (-x).", visible: ['axes', 'vectorA', 'vectorB', 'vectorC', 'angleC'] }
+        ];
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+            descriptionBox.innerHTML = step.desc;
+
+            for (const key in elements) {
+                elements[key].setAttribute('visibility', step.visible.includes(key) ? 'visible' : 'hidden');
+            }
+            if (step.desc.includes('$')) {
+                MathJax.typesetPromise([descriptionBox]);
+            }
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        document.addEventListener('MathJaxReady', () => {
+            MathJax.typesetPromise();
+        });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio: Resta de Vectores</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- MathJax para renderizar LaTeX -->
+    <script>
+        MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    document.dispatchEvent(new Event('MathJaxReady'));
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root { 
+            --bg-color: #e0e0e0; 
+            --primary-font-color: #3c3c3c; 
+            --accent-color: #c0392b; /* Rojo */
+            --accent-color-dark: #a93226;
+            --vector-a-color: #2980b9; /* Azul */
+            --vector-b-color: #27ae60; /* Verde */
+            --vector-r-color: #f39c12; /* Amarillo/Naranja */
+            --card-padding: 1.5rem; 
+            --card-border-radius: 1.25rem; 
+            --font-title: 'Anton', sans-serif; 
+            --font-body: 'Oswald', sans-serif; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--primary-font-color); line-height: 1.7; padding: 1.25rem; display: flex; justify-content: center; }
+        main { max-width: 800px; width: 100%; }
+        h1, h2, h3 { font-family: var(--font-title); letter-spacing: 1px; color: #333; text-align: center; margin-bottom: 1.25rem; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.5rem; text-align: left; color: var(--accent-color); margin-top: 2rem; }
+        p, li { font-size: 1.1rem; font-weight: 300; margin-bottom: 1rem; }
+        strong { font-weight: 500; }
+        .card { background: var(--bg-color); padding: var(--card-padding); border-radius: var(--card-border-radius); margin-bottom: 2rem; box-shadow: 9px 9px 16px #bebebe, -9px -9px 16px #ffffff; }
+        
+        #visualizacion-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #grafica-svg { background: var(--bg-color); border-radius: var(--card-border-radius); box-shadow: inset 7px 7px 14px #bebebe, inset -7px -7px 14px #ffffff; width: 100%; max-width: 500px; height: auto; aspect-ratio: 1; }
+        .anim-controls { display: flex; gap: 1rem; width: 100%; justify-content: center; }
+        .anim-btn { font-family: var(--font-body); font-size: 1rem; font-weight: 400; padding: 0.8rem 1.5rem; border: none; border-radius: 0.8rem; cursor: pointer; background: var(--bg-color); box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff; transition: all 0.2s ease-in-out; color: var(--primary-font-color); }
+        .anim-btn:hover { color: var(--accent-color); }
+        .anim-btn:active, .anim-btn:focus { box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; color: var(--accent-color-dark); outline: 2px solid var(--accent-color); outline-offset: 2px; }
+        .anim-btn:disabled { color: #999; cursor: not-allowed; box-shadow: inset 3px 3px 7px #bebebe, inset -3px -3px 7px #ffffff; }
+        #anim-description { width: 100%; text-align: center; font-size: 1.1rem; font-weight: 500; color: var(--accent-color-dark); min-height: 3em; background: #fdedec; padding: 0.75rem; border-radius: 0.8rem; border-left: 5px solid var(--accent-color); }
+        
+        .formula-box { background: var(--bg-color); padding: 1.25rem; margin-top: 1rem; border-radius: 1rem; box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff; text-align: center; overflow-x: auto; }
+        #respuestas-container .respuesta-item { font-size: 1.2rem; font-weight: 400; background: #fdedec; color: var(--accent-color-dark); padding: 1rem; border-radius: 0.6rem; border-left: 5px solid var(--accent-color); margin-bottom: 0.6rem; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Resta de Vectores</h1>
+        <section class="card">
+            <h2>Enunciado</h2>
+            <p>Un explorador realiza dos desplazamientos. El primer desplazamiento, $\vec{A}$, es de <strong>4.00 km hacia el Este</strong>. El segundo desplazamiento, $\vec{B}$, es de <strong>3.00 km en una dirección de 45° al Sur del Este</strong>.</p>
+            <p>Calcule el vector resultante $\vec{R} = \vec{A} - \vec{B}$. Determine la magnitud de $\vec{R}$ y su dirección (ángulo con respecto al eje Este positivo).</p>
+        </section>
+
+        <section id="visualizacion-container" class="card">
+            <h2>Construcción Gráfica</h2>
+            <div id="anim-description">Presiona "Siguiente" para construir el diagrama.</div>
+            <svg id="grafica-svg" viewBox="-50 -200 500 350"></svg>
+            <div class="anim-controls">
+                <button id="btn-prev" class="anim-btn">Anterior</button>
+                <button id="btn-next" class="anim-btn">Siguiente</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solución Detallada (Método Analítico)</h2>
+            <h3>1. Interpretación de la Resta de Vectores</h3>
+            <p>La resta de vectores $\vec{R} = \vec{A} - \vec{B}$ es equivalente a sumar el vector opuesto de $\vec{B}$, es decir: $\vec{R} = \vec{A} + (-\vec{B})$. El vector $-\vec{B}$ tiene la misma magnitud que $\vec{B}$ pero apunta en la dirección exactamente opuesta (180° de diferencia).</p>
+
+            <h3>2. Descomposición de Vectores Originales</h3>
+            <p>Descomponemos $\vec{A}$ y $\vec{B}$ en sus componentes $x$ e $y$ usando sus ángulos estándar (medidos desde el eje +x).</p>
+            <ul>
+                <li><strong>Vector A:</strong> Hacia el Este, el ángulo es $\theta_A = 0^\circ$.</li>
+                <li><strong>Vector B:</strong> "45° al Sur del Este" significa que medimos 45° desde el eje Este (+x) hacia el Sur (-y). El ángulo estándar es $\theta_B = -45^\circ$ o $315^\circ$.</li>
+            </ul>
+            <div class="formula-box">
+                $A_x = 4.00 \cdot \cos(0^\circ) = 4.00$<br>
+                $A_y = 4.00 \cdot \sin(0^\circ) = 0$<br><br>
+                $B_x = 3.00 \cdot \cos(315^\circ) = 2.12$<br>
+                $B_y = 3.00 \cdot \sin(315^\circ) = -2.12$
+            </div>
+
+            <h3>3. Resta de Componentes</h3>
+            <p>Restamos las componentes para encontrar las del vector resultante $\vec{R}$.</p>
+            <div class="formula-box">
+                $R_x = A_x - B_x = 4.00 - 2.12 = 1.88$<br>
+                $R_y = A_y - B_y = 0 - (-2.12) = 2.12$
+            </div>
+
+            <h3>4. Magnitud y Dirección de $\vec{R}$</h3>
+            <p>Con las componentes de $\vec{R}$, calculamos su magnitud y dirección.</p>
+            <div class="formula-box">
+                <strong>Magnitud:</strong> $|\vec{R}| = \sqrt{R_x^2 + R_y^2} = \sqrt{(1.88)^2 + (2.12)^2} = \sqrt{3.53 + 4.49} \approx 2.83 \text{ km}$<br><br>
+                <strong>Dirección:</strong> $\theta_R = \arctan\left(\frac{R_y}{R_x}\right) = \arctan\left(\frac{2.12}{1.88}\right) \approx 48.4^\circ$
+            </div>
+            <p>Como ambas componentes ($R_x$ y $R_y$) son positivas, el vector resultante se encuentra en el primer cuadrante.</p>
+        </section>
+        
+        <section id="respuestas-container" class="card">
+            <h2>Respuesta Final</h2>
+            <p class="respuesta-item">
+                El vector resultante $\vec{R}$ tiene una magnitud de <strong>2.83 km</strong> y una dirección de <strong>48.4° al Norte del Este</strong>.
+            </p>
+        </section>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const svg = document.getElementById('grafica-svg');
+        const descriptionBox = document.getElementById('anim-description');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        const PIXELS_PER_KM = 60;
+        const ORIGIN = { x: 0, y: 50 };
+
+        // Vector A
+        const magA = 4 * PIXELS_PER_KM;
+        const endA = { x: ORIGIN.x + magA, y: ORIGIN.y };
+
+        // Vector B
+        const magB = 3 * PIXELS_PER_KM;
+        const angleB_rad = -45 * Math.PI / 180;
+        const B_components = {
+            x: magB * Math.cos(angleB_rad),
+            y: -magB * Math.sin(angleB_rad) // SVG Y-axis is inverted
+        };
+
+        // Vector -B (opuesto)
+        const negB_components = { x: -B_components.x, y: -B_components.y };
+
+        // Vector R (Resultante)
+        const endR = {
+            x: endA.x + negB_components.x,
+            y: endA.y + negB_components.y
+        };
+
+        let svgContent = `
+            <defs>
+                <marker id="arrowhead" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" /></marker>
+            </defs>
+            
+            <g id="axes" visibility="hidden">
+                <line x1="-20" y1="${ORIGIN.y}" x2="480" y2="${ORIGIN.y}" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <line x1="${ORIGIN.x}" y1="150" x2="${ORIGIN.x}" y2="-150" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+                <text x="485" y="${ORIGIN.y + 5}" font-size="14" font-family="Oswald">E (x+)</text>
+                <text x="${ORIGIN.x + 5}" y="-155" font-size="14" font-family="Oswald">N (y+)</text>
+            </g>
+
+            <g id="vector-a" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${endA.x}" y2="${endA.y}" stroke="var(--vector-a-color)" stroke-width="3" marker-end="url(#arrowhead)" />
+                <text x="${endA.x / 2}" y="${endA.y - 10}" fill="var(--vector-a-color)" font-weight="bold">A</text>
+            </g>
+
+            <g id="vector-b-ghost" visibility="hidden">
+                <line x1="${endA.x}" y1="${endA.y}" x2="${endA.x + B_components.x}" y2="${endA.y + B_components.y}" stroke="var(--vector-b-color)" stroke-width="2" stroke-dasharray="5" marker-end="url(#arrowhead)" opacity="0.5"/>
+                <text x="${endA.x + B_components.x / 2 + 10}" y="${endA.y + B_components.y / 2 + 10}" fill="var(--vector-b-color)" opacity="0.7">B</text>
+            </g>
+
+            <g id="vector-b-neg" visibility="hidden">
+                <line x1="${endA.x}" y1="${endA.y}" x2="${endA.x + negB_components.x}" y2="${endA.y + negB_components.y}" stroke="var(--vector-b-color)" stroke-width="3" marker-end="url(#arrowhead)" />
+                <text x="${endA.x + negB_components.x / 2 - 30}" y="${endA.y + negB_components.y / 2}" fill="var(--vector-b-color)" font-weight="bold">-B</text>
+            </g>
+
+            <g id="vector-r" visibility="hidden">
+                <line x1="${ORIGIN.x}" y1="${ORIGIN.y}" x2="${endR.x}" y2="${endR.y}" stroke="var(--vector-r-color)" stroke-width="4" marker-end="url(#arrowhead)" />
+                <text x="${endR.x / 2}" y="${endR.y / 2 - 15}" fill="var(--vector-r-color)" font-weight="bold" font-size="16">R = A - B</text>
+            </g>
+        `;
+        svg.innerHTML = svgContent;
+
+        const elements = {
+            axes: document.getElementById('axes'),
+            vectorA: document.getElementById('vector-a'),
+            vectorBGhost: document.getElementById('vector-b-ghost'),
+            vectorBNeg: document.getElementById('vector-b-neg'),
+            vectorR: document.getElementById('vector-r')
+        };
+
+        const animationSteps = [
+            { desc: "Presiona 'Siguiente' para empezar.", visible: [] },
+            { desc: "<strong>Paso 1:</strong> Dibujamos los ejes cardinales y el primer vector $\\vec{A}$ (4 km al Este).", visible: ['axes', 'vectorA'] },
+            { desc: "<strong>Paso 2:</strong> Para restar $\\vec{B}$, primero visualizamos su dirección original (punteado).", visible: ['axes', 'vectorA', 'vectorBGhost'] },
+            { desc: "<strong>Paso 3:</strong> La resta $\\vec{A} - \\vec{B}$ es igual a la suma $\\vec{A} + (-\\vec{B})$. Dibujamos el vector opuesto $-\\vec{B}$.", visible: ['axes', 'vectorA', 'vectorBNeg'] },
+            { desc: "<strong>Paso 4:</strong> El vector resultante $\\vec{R}$ va desde el origen de $\\vec{A}$ hasta la punta de $-\\vec{B}$.", visible: ['axes', 'vectorA', 'vectorBNeg', 'vectorR'] },
+            { desc: "<strong>Paso 5:</strong> El diagrama está completo. Ahora podemos calcular la magnitud y dirección de $\\vec{R}$ analíticamente.", visible: ['axes', 'vectorA', 'vectorBNeg', 'vectorR'] }
+        ];
+
+        let currentStep = 0;
+
+        function updateVisualization(stepIndex) {
+            const step = animationSteps[stepIndex];
+            btnPrev.disabled = stepIndex === 0;
+            btnNext.disabled = stepIndex === animationSteps.length - 1;
+            descriptionBox.innerHTML = step.desc;
+
+            for (const key in elements) {
+                elements[key].setAttribute('visibility', step.visible.includes(key) ? 'visible' : 'hidden');
+            }
+            if (step.desc.includes('$')) {
+                MathJax.typesetPromise([descriptionBox]);
+            }
+        }
+
+        btnNext.addEventListener('click', () => { if (currentStep < animationSteps.length - 1) { currentStep++; updateVisualization(currentStep); } });
+        btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateVisualization(currentStep); } });
+        
+        document.addEventListener('MathJaxReady', () => {
+            MathJax.typesetPromise();
+        });
+        
+        updateVisualization(0);
+    });
+    </script>
+
+</body>
+</html>
